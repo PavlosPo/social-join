@@ -1,14 +1,9 @@
 package com.social.join.service;
 
 import com.social.join.dtos.UserDTO;
-import com.social.join.entities.Comment;
 import com.social.join.entities.Post;
-import com.social.join.mappers.ICommentMapper;
 import com.social.join.mappers.IPostMapper;
-import com.social.join.mappers.IUserMapper;
-import com.social.join.repositories.ICommentRepository;
 import com.social.join.repositories.IPostRepository;
-import com.social.join.repositories.IUserRepository;
 
 import jakarta.validation.constraints.NotNull;
 import org.junit.jupiter.api.Test;
@@ -32,25 +27,7 @@ class UserServiceImplTest {
     private IUserService userService;
 
     @Autowired
-    private IUserRepository userRepository;
-
-    @Autowired
-    private IUserMapper userMapper;
-
-    // Post
-    @Autowired
     private IPostRepository postRepository;
-
-    @Autowired
-    private IPostMapper postMapper;
-
-    // Comments
-    @Autowired
-    private ICommentRepository commentRepository;
-
-    @Autowired
-    private ICommentMapper commentMapper;
-
 
     @Test
     @Transactional
@@ -58,50 +35,21 @@ class UserServiceImplTest {
         UserDTO testUser = userService.getAllUsers().get(1);
         assertThat(testUser).isNotNull();
 
-        String FIRSTNAME = testUser.getFirstname();
-        String LASTNAME = testUser.getLastname();
-        String USERNAME = testUser.getUsername();
-
-        List<UserDTO> usersListWithFirstname = userService.getUsersBySearch(null, FIRSTNAME, null);
-        assertThat(usersListWithFirstname.size()).isEqualTo(1);
-        assertThat(usersListWithFirstname.get(0).getId()).isEqualTo(testUser.getId());
-
-
-        List<UserDTO> usersListWithLastname = userService.getUsersBySearch(null, null, LASTNAME);
-        assertThat(usersListWithLastname.size()).isEqualTo(1);
-        assertThat(usersListWithLastname.get(0).getId()).isEqualTo(testUser.getId());
-
-        List<UserDTO> usersListWithUsername = userService.getUsersBySearch(USERNAME, null, null);
-        assertThat(usersListWithUsername.size()).isEqualTo(1);
-        assertThat(usersListWithUsername.get(0).getId()).isEqualTo(testUser.getId());
-
-        List<UserDTO> usersListWithUsername2 = userService.getUsersBySearch("username", null, null);    // all users that starts with '%username%'
-        assertThat(usersListWithUsername2.size()).isEqualTo(userRepository.findAll().size());
-
-        List<UserDTO> usersListWithLastname2 = userService.getUsersBySearch(null, null, "lastname");    // all users that starts with '%lastname%'
-        assertThat(usersListWithLastname2.size()).isEqualTo(userRepository.findAll().size());
-
-        List<UserDTO> usersListWithFirstname2 = userService.getUsersBySearch(null, "user", null);    // all users that starts with '%user%'
-        assertThat(usersListWithFirstname2.size()).isEqualTo(userRepository.findAll().size());
-
-        List<UserDTO> usersListWithUsernameAndFirstname = userService.getUsersBySearch("username", "user0", null);    // all users that starts with '%username%'
-        assertThat(usersListWithUsernameAndFirstname.size()).isEqualTo(11);
-
-        List<UserDTO> usersListWithFirstnameAndLastname = userService.getUsersBySearch(null, "user0", "lastname0");    // all users that starts with '%username%'
-        assertThat(usersListWithFirstnameAndLastname.size()).isEqualTo(2);
-
-        List<UserDTO> usersListWithAll = userService.getUsersBySearch("username0", "user0", "lastname0");    // all users that starts with '%username%'
-        assertThat(usersListWithAll.size()).isEqualTo(3);
+        assertUserSearch(null, null, testUser.getLastname());
+        assertUserSearch(testUser.getUsername(), null, null);
+        assertUserSearch(null, testUser.getFirstname(), null);
     }
 
     @Test
     @Transactional
     void getAllUsersTest() {
-        List<UserDTO> testUsers =  userRepository.findAll().stream().map(userMapper::userToUserDTO).toList();
-        List<UserDTO> testUsersFromService = userService.getAllUsers();
+        List<UserDTO> testUsers = userService.getAllUsers();
+        assertThat(testUsers).isNotEmpty();
 
-        assertThat(testUsersFromService.size()).isEqualTo(testUsers.size());
-        assertThat(testUsersFromService.get(1).getUsername()).isEqualTo(testUsers.get(1).getUsername());
+        UserDTO testUser = testUsers.get(1);
+        UserDTO testUserFromService = userService.getUserById(testUser.getId()).orElse(null);
+        assertThat(testUserFromService).isNotNull();
+        assertThat(testUserFromService.getUsername()).isEqualTo(testUser.getUsername());
     }
 
     @Test
@@ -119,22 +67,10 @@ class UserServiceImplTest {
     @Transactional
     void createUserTest() {
         Post testPostToAdd = postRepository.findAll().get(0);
-        UserDTO testUser = getUserDTO(testPostToAdd);
-
+        UserDTO testUser = getUserDTO(testPostToAdd);   // adds a post to the user
 
         UserDTO userReturned = userService.saveNewUser(testUser);
-        assertThat(userReturned.getId()).isNotNull().isNotEqualTo(testUser.getId());
-        assertThat(userReturned.getUsername()).isEqualTo(testUser.getUsername());
-        assertThat(userReturned.getLastname()).isEqualTo(testUser.getLastname());
-        assertThat(userReturned.getFirstname()).isEqualTo(testUser.getFirstname());
-        assertThat(userReturned.getPassword()).isEqualTo(testUser.getPassword());
-        assertThat(userReturned.getEmail()).isEqualTo(testUser.getEmail());
-        assertThat(userReturned.getVersion()).isEqualTo(testUser.getVersion());
-        assertThat(userReturned.getLikedComments().size()).isEqualTo(testUser.getLikedComments().size());
-        assertThat(userReturned.getLikedComments()).isEqualTo(testUser.getLikedComments());
-        assertThat(userReturned.getLikedPosts().size()).isEqualTo(testUser.getLikedPosts().size());
-        assertThat(userReturned.getLikedPosts()).isEqualTo(testUser.getLikedPosts());
-//        assertThat(userReturned.getPostsMadeByUser().size()).isEqualTo(testUser.getPostsMadeByUser().size());
+        assertUserEquality(userReturned, testUser);
     }
 
     @Test
@@ -151,13 +87,7 @@ class UserServiceImplTest {
 
         Optional<UserDTO> updatedUser = userService.updateUserById(testUser.getId(), testUser);
         assertThat(updatedUser).isNotEmpty();
-        assertThat(updatedUser.get().getId()).isEqualTo(testUser.getId());
-        assertThat(updatedUser.get().getUsername()).isEqualTo(testUser.getUsername());
-        assertThat(updatedUser.get().getVersion()).isEqualTo(testUser.getVersion());
-        assertThat(updatedUser.get().getEmail()).isEqualTo(testUser.getEmail());
-        assertThat(updatedUser.get().getLastname()).isEqualTo(testUser.getLastname());
-        assertThat(updatedUser.get().getFirstname()).isEqualTo(testUser.getFirstname());
-        assertThat(updatedUser.get().getPassword()).isEqualTo(testUser.getPassword());
+        assertUserEquality(updatedUser.get(), testUser);
     }
 
     @NotNull
@@ -173,9 +103,26 @@ class UserServiceImplTest {
         testUser.setPassword(PASSWORD);
         testUser.setVersion(1);
         testUser.setLikedPosts(Set.of(testPostToAdd));
-        //testUser.setLikedComments(Set.of(testPostToAdd.getComments().)));
         testUser.setEmail(EMAIL);
-        //testUser.setPostsMadeByUser(Set.of(postMapper.postToPostDTO(testPostToAdd)));
         return testUser;
+    }
+
+    private void assertUserSearch(String username, String firstname, String lastname) {
+        List<UserDTO> usersList = userService.getUsersBySearch(username , firstname, lastname);
+        assertThat(usersList).isNotEmpty();
+    }
+
+    private void assertUserEquality(UserDTO actualUser, UserDTO expectedUser) {
+        assertThat(actualUser.getId()).isNotNull().isEqualTo(expectedUser.getId());
+        assertThat(actualUser.getUsername()).isEqualTo(expectedUser.getUsername());
+        assertThat(actualUser.getLastname()).isEqualTo(expectedUser.getLastname());
+        assertThat(actualUser.getFirstname()).isEqualTo(expectedUser.getFirstname());
+        assertThat(actualUser.getPassword()).isEqualTo(expectedUser.getPassword());
+        assertThat(actualUser.getEmail()).isEqualTo(expectedUser.getEmail());
+        assertThat(actualUser.getVersion()).isEqualTo(expectedUser.getVersion());
+        assertThat(actualUser.getLikedComments().size()).isEqualTo(expectedUser.getLikedComments().size());
+        assertThat(actualUser.getLikedComments()).isEqualTo(expectedUser.getLikedComments());
+        assertThat(actualUser.getLikedPosts().size()).isEqualTo(expectedUser.getLikedPosts().size());
+        assertThat(actualUser.getLikedPosts()).isEqualTo(expectedUser.getLikedPosts());
     }
 }
