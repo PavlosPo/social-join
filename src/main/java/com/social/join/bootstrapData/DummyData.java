@@ -36,6 +36,9 @@ public class DummyData implements CommandLineRunner {
         commentRepository.saveAll(commentsToSave);
         hashtagRepository.saveAll(hashtagsToSave);
         usersToSave.forEach(System.out::println);
+        postsToSave.forEach(System.out::println);
+        commentsToSave.forEach(System.out::println);
+        hashtagsToSave.forEach(System.out::println);
     }
 
 

@@ -1,6 +1,7 @@
 package com.social.join.dtos;
 
 
+import jakarta.annotation.Nullable;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
@@ -16,30 +17,30 @@ import java.util.Set;
 @AllArgsConstructor
 public class PostDTO {
     @Id
-    @GeneratedValue(strategy = GenerationType.AUTO)
-    @Column(updatable = false, nullable = false)
+    @NotBlank
+    @NotNull
     private Integer id;
 
     @NotNull
     @NotBlank
-    @Column(name = "CONTENT", length = 512, nullable = false, updatable = true, unique = false)
     private String content;
 
-    @OneToMany
-    private Set<UserDTO> usersLikedIt;
+    @Nullable
+    private Set<UserDTO> likedByUsers;
 
     @NotNull
     @NotBlank
-    @OneToOne
     private UserDTO userCreated;
 
-    @OneToMany
+    @Nullable
     private Set<CommentDTO> comments;
 
-    @OneToMany
-    private Set<HashtagDTO> hashtags;
+//    @Nullable
+//    private Set<HashtagDTO> hashtags;
 
+    @NotNull
     private LocalDateTime createdDate;
-    private LocalDateTime updatedDate;
 
+    @NotNull
+    private LocalDateTime updatedDate;
 }

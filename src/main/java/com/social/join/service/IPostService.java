@@ -5,10 +5,12 @@ import com.social.join.dtos.HashtagDTO;
 import com.social.join.dtos.PostDTO;
 import com.social.join.dtos.UserDTO;
 import com.social.join.entities.User;
+import org.springframework.stereotype.Service;
 
 import java.util.List;
 import java.util.Optional;
 
+@Service
 public interface IPostService {
 
     /**
@@ -44,11 +46,12 @@ public interface IPostService {
     /**
      * Updates the {@link com.social.join.entities.Post} in the database,
      * given a new {@link PostDTO} with the Post's id
-     * @param id    the {@link com.social.join.entities.Post} id
-     * @param postDTO   a {@link PostDTO} instance to update the Post with
-     * @return  the {@link PostDTO} instance that we want to be updated to
+     *
+     * @param id      the {@link com.social.join.entities.Post} id
+     * @param postDTO a {@link PostDTO} instance to update the Post with
+     * @return the  {@link Optional} of {@link PostDTO} instance that we want to be updated to
      */
-    PostDTO updatePostById(int id, PostDTO postDTO);
+    Optional<PostDTO> updatePostById(int id, PostDTO postDTO);
 
     /**
      * Gets all the comments  of a {@link com.social.join.entities.Post}

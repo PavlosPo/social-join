@@ -1,9 +1,11 @@
 package com.social.join.service;
 
 import com.social.join.dtos.HashtagDTO;
+import org.springframework.stereotype.Service;
 
 import java.util.Optional;
 
+@Service
 public interface IHashtagService {
     /**
      * Get the hashtag searched by id

@@ -5,10 +5,14 @@ import com.social.join.dtos.HashtagDTO;
 import com.social.join.dtos.PostDTO;
 import com.social.join.dtos.UserDTO;
 import com.social.join.entities.User;
+import org.springframework.context.annotation.Primary;
+import org.springframework.stereotype.Service;
 
 import java.util.List;
 import java.util.Optional;
 
+@Service
+@Primary
 public class PostServiceImpl implements IPostService {
     @Override
     public PostDTO createPost(User user, PostDTO postDTO) {
@@ -31,7 +35,7 @@ public class PostServiceImpl implements IPostService {
     }
 
     @Override
-    public PostDTO updatePostById(int id, PostDTO postDTO) {
+    public Optional<PostDTO> updatePostById(int id, PostDTO postDTO) {
         return null;
     }
 

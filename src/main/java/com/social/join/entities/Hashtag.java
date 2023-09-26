@@ -15,7 +15,7 @@ import java.util.UUID;
 @NoArgsConstructor
 public class Hashtag {
     @Id
-    @GeneratedValue(strategy = GenerationType.AUTO)
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(updatable = false, nullable = false)
     private Integer id;
 
@@ -27,7 +27,4 @@ public class Hashtag {
 
     @Column(name = "DESCRIPTION")
     private String description;
-
-    @ManyToMany(mappedBy = "hashtags")
-    private Set<Post> posts;
 }

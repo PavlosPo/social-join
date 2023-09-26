@@ -7,8 +7,9 @@ import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Size;
 import lombok.*;
 
+import java.util.HashSet;
 import java.util.List;
-
+import java.util.Set;
 
 
 @Builder
@@ -19,7 +20,7 @@ import java.util.List;
 @AllArgsConstructor
 public class User {
     @Id
-    @GeneratedValue(strategy = GenerationType.AUTO)
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(updatable = false, nullable = false)
     private Integer id;
 
@@ -47,10 +48,22 @@ public class User {
     @Size(min = 6)
     private String password;
 
+//    @OneToMany(mappedBy = "userCreated")
+//    private Set<Post> postsMadeByUser = new HashSet<>();
 
-//    @ManyToMany(fetch = FetchType.LAZY, mappedBy = "usersLikedIt")
-//    private List<Post> likedPosts;
-//
-//    @ManyToMany(fetch = FetchType.LAZY, mappedBy = "usersLikedIt")
-//    private List<Comment> likedComments;
+    @ManyToMany
+    @JoinTable(
+            name = "USER_LIKES_POSTS",
+            joinColumns = @JoinColumn(name = "USER_ID"),
+            inverseJoinColumns = @JoinColumn(name = "POST_ID")
+    )
+    private Set<Post> likedPosts = new HashSet<>();
+
+    @ManyToMany
+    @JoinTable(
+            name = "USER_LIKES_COMMENTS",
+            joinColumns = @JoinColumn(name = "USER_ID"),
+            inverseJoinColumns = @JoinColumn(name = "COMMENT_ID")
+    )
+    private Set<Comment> likedComments = new HashSet<>();
 }

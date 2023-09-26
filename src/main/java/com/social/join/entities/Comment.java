@@ -2,9 +2,12 @@ package com.social.join.entities;
 
 import jakarta.persistence.*;
 import lombok.*;
+import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.GenericGenerator;
+import org.hibernate.annotations.UpdateTimestamp;
 
 import java.time.LocalDateTime;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 import java.util.UUID;
@@ -18,7 +21,7 @@ import java.util.UUID;
 public class Comment {
 
     @Id
-    @GeneratedValue(strategy = GenerationType.AUTO)
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(updatable = false, nullable = false)
     private Integer id;
 
@@ -30,20 +33,20 @@ public class Comment {
     private String content;
 
     @ManyToOne
-    @JoinColumn(name = "COMMENT_ID", referencedColumnName = "ID", nullable = false)
+    @JoinColumn(name = "POST_ID", referencedColumnName = "ID", nullable = false)
     private Post post;
 
-    @ManyToMany
-    @JoinTable(name = "COMMENTS_HASHTAGS", joinColumns = @JoinColumn(name = "COMMENT_ID"),
-            inverseJoinColumns = @JoinColumn(name = "HASHTAG_ID", referencedColumnName = "ID"))
-    private Set<Hashtag> hashtag;
+//    @ManyToMany
+//    private Set<Hashtag> hashtag = new HashSet<>();
 
+    @ManyToMany(mappedBy = "likedComments")
+    private Set<User> likedByUsers;
 
-    @ManyToMany
-    @JoinTable(name = "COMMENTS_USERS_LIKES", joinColumns = @JoinColumn(name = "USER_ID"),
-            inverseJoinColumns = @JoinColumn(name = "POST_ID", referencedColumnName = "ID"))
-    private List<User> usersLikedIt;
-
+    @CreationTimestamp
+    @Column(name = "CREATED_DATE")
     private LocalDateTime createdDate;
+
+    @UpdateTimestamp
+    @Column(name = "UPDATED_DATE")
     private LocalDateTime updateDate;
 }

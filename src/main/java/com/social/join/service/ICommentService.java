@@ -1,10 +1,23 @@
 package com.social.join.service;
 
 import com.social.join.dtos.CommentDTO;
+import com.social.join.dtos.PostDTO;
+import com.social.join.dtos.UserDTO;
+import org.springframework.stereotype.Service;
 
 import java.util.Optional;
 
+@Service
 public interface ICommentService {
+
+
+    /**
+     * Here we create a new comment in a post
+     * @param userDTO   the user that does the comment
+     * @param postDTO   the post that the comment goes to
+     * @return  the new comment instance as {@link CommentDTO}
+     */
+    CommentDTO createComment(UserDTO userDTO, PostDTO postDTO);
 
     /**
      * It returns the {@link CommentDTO} instance of the comment with the corensponding id

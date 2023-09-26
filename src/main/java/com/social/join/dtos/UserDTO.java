@@ -1,11 +1,16 @@
 package com.social.join.dtos;
 
+import com.social.join.entities.Comment;
+import com.social.join.entities.Post;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Size;
 import lombok.*;
+
+import java.util.HashSet;
+import java.util.Set;
 
 @Getter
 @Setter
@@ -14,18 +19,14 @@ import lombok.*;
 @AllArgsConstructor
 public class UserDTO {
     @Id
-    @GeneratedValue(strategy = GenerationType.AUTO)
-    @Column(updatable = false, nullable = false)
     private Integer id;
 
-    @Version
     private Integer version;
 
     @NotNull
     @NotBlank
     private String firstname;
 
-    @NotNull
     @NotBlank
     private String lastname;
 
@@ -33,9 +34,9 @@ public class UserDTO {
     @NotBlank
     private String username;
 
-    @Email
-    @NotBlank
     @NotNull
+    @NotBlank
+    @Email(message = "Email Error")
     private String email;
 
     @NotNull
@@ -43,4 +44,9 @@ public class UserDTO {
     @Size(min = 6)
     private String password;
 
+//    private Set<Post> postsMadeByUser = new HashSet<>();
+
+    private Set<Post> likedPosts = new HashSet<>();
+
+    private Set<Comment> likedComments = new HashSet<>();
 }
