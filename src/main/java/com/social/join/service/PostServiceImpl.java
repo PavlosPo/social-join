@@ -1,56 +1,88 @@
 package com.social.join.service;
 
-import com.social.join.dtos.CommentDTO;
-import com.social.join.dtos.HashtagDTO;
 import com.social.join.dtos.PostDTO;
 import com.social.join.dtos.UserDTO;
-import com.social.join.entities.User;
+import com.social.join.entities.Post;
+import com.social.join.mappers.IPostMapper;
+import com.social.join.mappers.IUserMapper;
+import com.social.join.repositories.IPostRepository;
+import com.social.join.service.exceptions.PostNotFoundException;
+import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Primary;
 import org.springframework.stereotype.Service;
 
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
+import java.util.concurrent.atomic.AtomicReference;
+import java.util.stream.Collectors;
 
 @Service
 @Primary
+@RequiredArgsConstructor
 public class PostServiceImpl implements IPostService {
+    private final IPostRepository postRepository;
+    private final IPostMapper postMapper;
+    private final IUserMapper userMapper;
+
     @Override
-    public PostDTO createPost(User user, PostDTO postDTO) {
-        return null;
+    public PostDTO savePost(PostDTO postDTO) {
+        return postMapper.postToPostDTO(postRepository.save(postMapper.postDTOToPost(postDTO)));
     }
 
     @Override
     public List<PostDTO> getPostsByUserId(int id) {
-        return null;
+        return postRepository.getPostsByUserCreated_Id(id).stream()
+                .map(postMapper::postToPostDTO).toList();
     }
 
     @Override
     public Optional<PostDTO> getPostById(int id) {
-        return Optional.empty();
+        return Optional.ofNullable(postMapper.postToPostDTO(postRepository.findById(id).orElse(null)));
     }
 
     @Override
     public Boolean deletePostById(int id) {
-        return null;
+        if (postRepository.existsById(id)) {
+            postRepository.deleteById(id);
+            return true;
+        }
+        return false;
     }
 
     @Override
     public Optional<PostDTO> updatePostById(int id, PostDTO postDTO) {
-        return null;
+        AtomicReference<Optional<PostDTO>> atomicReference = new AtomicReference<>();
+
+        postRepository.findById(id).ifPresentOrElse(foundPost -> {
+            Post mappedPost = postMapper.postDTOToPost(postDTO);
+            foundPost.setContent(mappedPost.getContent());
+            foundPost.setLikedByUsers(mappedPost.getLikedByUsers());
+            foundPost.setComments(mappedPost.getComments());
+            foundPost.setUpdatedDate(LocalDateTime.now());
+            atomicReference.set(Optional.of(postMapper.postToPostDTO(postRepository.save(foundPost))));
+        }, () -> {
+            atomicReference.set(Optional.empty());
+        });
+        return atomicReference.get();
     }
 
     @Override
-    public List<CommentDTO> getAllTheCommentsByPostId(int id) {
-        return null;
-    }
+    public List<UserDTO> getUsersThatLikedByPostId(int id) throws PostNotFoundException {
+        AtomicReference<List<UserDTO>> atomicReference = new AtomicReference<>();
+        Optional<Post> foundPost = postRepository.findById(id);
 
-    @Override
-    public List<HashtagDTO> getAllTheHashtagsByPostId(int id) {
-        return null;
-    }
+        // Check if there is a post
+        if (foundPost.isEmpty()) {
+            throw new PostNotFoundException();
+        }
 
-    @Override
-    public List<UserDTO> getUsersThatLikedByPostId(int id) {
-        return null;
+        foundPost.ifPresent(post -> {
+            atomicReference.set(post.getLikedByUsers()
+                    .stream()
+                    .map(userMapper::userToUserDTO)
+                    .collect(Collectors.toList()));
+        });
+        return atomicReference.get();
     }
 }

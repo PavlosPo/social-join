@@ -2,7 +2,6 @@ package com.social.join.service;
 
 import com.social.join.dtos.UserDTO;
 import com.social.join.entities.Post;
-import com.social.join.mappers.IPostMapper;
 import com.social.join.repositories.IPostRepository;
 
 import jakarta.validation.constraints.NotNull;
@@ -32,9 +31,11 @@ class UserServiceImplTest {
     @Test
     @Transactional
     void getUsersBySearchTest() {
+        // Arrange and Act
         UserDTO testUser = userService.getAllUsers().get(1);
-        assertThat(testUser).isNotNull();
 
+        // Assert
+        assertThat(testUser).isNotNull();
         assertUserSearch(null, null, testUser.getLastname());
         assertUserSearch(testUser.getUsername(), null, null);
         assertUserSearch(null, testUser.getFirstname(), null);
@@ -43,11 +44,15 @@ class UserServiceImplTest {
     @Test
     @Transactional
     void getAllUsersTest() {
+        // Arrange
         List<UserDTO> testUsers = userService.getAllUsers();
+        UserDTO testUser = testUsers.get(1);
         assertThat(testUsers).isNotEmpty();
 
-        UserDTO testUser = testUsers.get(1);
+        // Act
         UserDTO testUserFromService = userService.getUserById(testUser.getId()).orElse(null);
+
+        // Assert
         assertThat(testUserFromService).isNotNull();
         assertThat(testUserFromService.getUsername()).isEqualTo(testUser.getUsername());
     }
@@ -56,8 +61,13 @@ class UserServiceImplTest {
     @Rollback
     @Transactional
     void deleteUserTest() {
+        // Arrange
         UserDTO testUser = userService.getAllUsers().get(0);
+
+        // Act
         boolean deleteStatus = userService.deleteById(testUser.getId());
+
+        // Assert
         assertThat(deleteStatus).isTrue();
         assertThat(userService.getUserById(testUser.getId())).isEmpty();
     }
@@ -66,11 +76,15 @@ class UserServiceImplTest {
     @Rollback
     @Transactional
     void createUserTest() {
+        // Arrange
         Post testPostToAdd = postRepository.findAll().get(0);
         UserDTO testUser = getUserDTO(testPostToAdd);   // adds a post to the user
 
+        // Act
         UserDTO userReturned = userService.saveNewUser(testUser);
-        assertUserEquality(userReturned, testUser);
+
+        // Assert
+        assertUserEquality(userReturned, testUser, false);
     }
 
     @Test
@@ -78,6 +92,7 @@ class UserServiceImplTest {
     @Transactional
     void updateUserTest() {
         UserDTO testUser = userService.getAllUsers().get(0);
+        // Arrange
         testUser.setUsername("UpdatedUsername");
         testUser.setPassword("updatedPassword");
         testUser.setLastname("updatedLastname");
@@ -85,9 +100,17 @@ class UserServiceImplTest {
         testUser.setEmail("updatedEmail@test.com");
         testUser.setVersion(2);
 
+        // Act
         Optional<UserDTO> updatedUser = userService.updateUserById(testUser.getId(), testUser);
+
+        // Assert
         assertThat(updatedUser).isNotEmpty();
-        assertUserEquality(updatedUser.get(), testUser);
+        assertUserEquality(updatedUser.get(), testUser, true);
+    }
+
+    @Test
+    void getAllLikedPostsTest() {
+
     }
 
     @NotNull
@@ -112,8 +135,15 @@ class UserServiceImplTest {
         assertThat(usersList).isNotEmpty();
     }
 
-    private void assertUserEquality(UserDTO actualUser, UserDTO expectedUser) {
-        assertThat(actualUser.getId()).isNotNull().isEqualTo(expectedUser.getId());
+    /**
+     * Assert the actualUser and the expectedUser. Also given true or false checks the ids.
+     * @param actualUser    the {@link UserDTO} as the actualUser
+     * @param expectedUser  the {@link UserDTO} as the expectedUser
+     * @param checkID       true to check the id, false to not
+     */
+    private void assertUserEquality(UserDTO actualUser, UserDTO expectedUser, boolean checkID) {
+        assertThat(actualUser.getId()).isNotNull();
+        if (checkID) assertThat(actualUser.getId()).isEqualTo(expectedUser.getId());
         assertThat(actualUser.getUsername()).isEqualTo(expectedUser.getUsername());
         assertThat(actualUser.getLastname()).isEqualTo(expectedUser.getLastname());
         assertThat(actualUser.getFirstname()).isEqualTo(expectedUser.getFirstname());

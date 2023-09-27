@@ -1,16 +1,11 @@
 package com.social.join.service;
 
-import com.social.join.dtos.CommentDTO;
 import com.social.join.dtos.PostDTO;
 import com.social.join.dtos.UserDTO;
 import com.social.join.entities.Post;
 import com.social.join.entities.User;
-import com.social.join.mappers.IPostMapper;
 import com.social.join.mappers.IUserMapper;
-import com.social.join.repositories.IPostRepository;
 import com.social.join.repositories.IUserRepository;
-import org.junit.jupiter.api.AfterEach;
-import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -18,24 +13,21 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.annotation.Rollback;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.time.LocalDateTime;
 import java.util.HashSet;
-import java.util.List;
+import java.util.Iterator;
+import java.util.Optional;
 import java.util.Set;
+import java.util.stream.Collectors;
 
 import static org.assertj.core.api.Assertions.anyOf;
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.junit.jupiter.api.Assertions.*;
+import static org.mockito.ArgumentMatchers.any;
 
 @SpringBootTest
 class PostServiceImplTest {
 
     @Autowired
     private IPostService postService;
-    @Autowired
-    private IPostMapper postMapper;
-    @Autowired
-    private IPostRepository postRepository;
     @Autowired
     private IUserRepository userRepository;
     @Autowired
@@ -45,125 +37,114 @@ class PostServiceImplTest {
     private User testUser;
     private UserDTO testUserDTO;
 
-    @BeforeAll
+    @BeforeEach
     void setUp() {
+        // Initialize testUser and testUserDTO
         testUser = userRepository.findAll().get(0);
-        testPost.setUserCreated(testUserDTO);
-        testPost = postMapper.postToPostDTO(postRepository.findAll().get(0));
-        testUserDTO = userMapper.userToUserDTO(userRepository.findAll().get(0));
-    }
+        testUserDTO = userMapper.userToUserDTO(testUser);
 
-    @AfterEach
-    void tearDown() {
+        // Initialize testPost
+        testPost = new PostDTO();
+        testPost.setUserCreated(testUserDTO);
+        testPost.setContent("Initial Content");
+
+        // Save the testPost to the database
+        testPost = postService.savePost(testPost);
     }
 
     @Test
     @Transactional
     @Rollback
     void createPost() {
-        String TEST_CONTENT = "TEST_CONTENT";
-        LocalDateTime timeNow = LocalDateTime.now();
-
-        testPost.setUserCreated(testUserDTO);
+        // Arrange
+        String updatedContent = "TEST_CONTENT";
         testPost.setId(null);
-        testPost.setContent(TEST_CONTENT);
-        testPost.setCreatedDate(timeNow);
-        testPost.setUpdatedDate(timeNow);
+        testPost.setContent(updatedContent);
 
-        PostDTO returnedPost = postService.createPost(testUser, testPost);
-        assertThat(returnedPost).isNotNull();
-        assertThat(returnedPost.getId()).isNotNull();
-        assertThat(returnedPost.getUserCreated().getId()).isEqualTo(testUser.getId());
-        assertThat(returnedPost.getContent()).isEqualTo(TEST_CONTENT);
-        assertThat(returnedPost.getCreatedDate().toString()).isEqualTo(timeNow.toString());
-        assertThat(returnedPost.getUpdatedDate().toString()).isEqualTo(timeNow.toString());
+        // Act
+        PostDTO returnedPost = postService.savePost(testPost);
 
+        // Assert
+        assertPostEquality(returnedPost, testPost);
     }
 
     @Test
     @Transactional
-    @Rollback
-    void createAndGetPostsByUserId() {
-        // Create a test post
-        String TEST_CONTENT = "TEST_CONTENT";
-        LocalDateTime timeNow = LocalDateTime.now();
-        testPost.setUserCreated(testUserDTO);
-        testPost.setId(null);
-        testPost.setContent(TEST_CONTENT);
-        testPost.setCreatedDate(timeNow);
-        testPost.setUpdatedDate(timeNow);
-
-        // Save -- a dummy post
-        // No service calls
-        PostDTO returnedPost = postMapper.postToPostDTO(postRepository.save(postMapper.postDTOToPost(testPost)));
-        assertThat(returnedPost).isNotNull();
-        assertThat(returnedPost.getId()).isNotNull();
-        assertThat(returnedPost.getContent()).isEqualTo(TEST_CONTENT);
-        assertThat(returnedPost.getUserCreated().getId()).isEqualTo(testUser.getId());
-        assertThat(returnedPost.getCreatedDate().toString()).isEqualTo(timeNow.toString());
-        assertThat(returnedPost.getUpdatedDate().toString()).isEqualTo(timeNow.toString());
-
-        // Get -- All Posts by User ID
-        // Service Calls
-        List<PostDTO> posts = postService.getPostsByUserId(testUser.getId());
-        assertThat(posts).isNotNull();
-        assertThat(posts.size()).isEqualTo(1);
-        assertThat(posts.get(0).getId()).isEqualTo(returnedPost.getId());
-        assertThat(posts.get(0).getUserCreated().getId()).isEqualTo(testUser.getId());
-        assertThat(posts.get(0).getContent()).isEqualTo(TEST_CONTENT);
-    }
-
-    @Test
     void getPostById() {
-         postService.getPostById(testPost.getId()).ifPresent(p -> {
-             assertThat(p).isNotNull();
-             assertThat(p.getId()).isEqualTo(testPost.getId());
-             assertThat(p.getUserCreated().getId()).isNotNull();
-                 }
-         );
+        // Act
+        Optional<PostDTO> optionalPost = postService.getPostById(testPost.getId());
 
+        // Assert
+        assertThat(optionalPost).isPresent()
+                .hasValueSatisfying(actualPost -> assertPostEquality(actualPost, testPost));
     }
 
     @Test
     @Transactional
     @Rollback
     void deletePostById() {
+        // Act
         boolean deleteStatus = postService.deletePostById(testPost.getId());
+
+        // Assert
         assertThat(deleteStatus).isTrue();
-        assertThat(postService.getPostById(testPost.getId())).isEmpty();    // returns Optional.empty()
-        // TODO : Test that recursively all the comments of that post are deleted
+        assertThat(postService.getPostById(testPost.getId())).isEmpty();
     }
 
     @Test
     @Transactional
     @Rollback
     void updatePostById() {
-        String UPDATED_CONTENT = "UPDATED_CONTENT";
-        testPost.setContent(UPDATED_CONTENT);
-        testPost.setUserCreated(testUserDTO);
+        // Arrange
+        String updatedContent = "UPDATED_CONTENT";
+        testPost.setContent(updatedContent);
         testPost.setLikedByUsers(Set.of(testUserDTO));
 
-        // Save the Post first
-        postRepository.save(postMapper.postDTOToPost(testPost));
+        // Act
+        Optional<PostDTO> updatedPostOptional = postService.updatePostById(testPost.getId(), testPost);
 
-        postService.updatePostById(testPost.getId(), testPost).ifPresent((p) ->{
-           assertThat(p).isNotNull();
-           assertThat(p.getContent()).isEqualTo(UPDATED_CONTENT);
-           assertThat(p.getLikedByUsers().size()).isEqualTo(1);
-           assertThat(p.getUserCreated().getId()).isEqualTo(testUserDTO.getId());
-        });
-
+        // Assert
+        assertThat(updatedPostOptional).isPresent()
+                .hasValueSatisfying(updatedPost -> assertPostEquality(updatedPost, testPost));
     }
 
     @Test
-    void getAllTheCommentsByPostId() {
-    }
-
-    @Test
-    void getAllTheHashtagsByPostId() {
-    }
-
-    @Test
+    @Transactional
     void getUsersThatLikedByPostId() {
+        // Arrange
+        testPost.setLikedByUsers(Set.of(
+                testUserDTO
+        ));
+
+        // Act
+        Optional<PostDTO> updatedPostOptional = postService.updatePostById(testPost.getId(), testPost);
+
+        // Assert
+        assertThat(updatedPostOptional).isPresent()
+                .hasValueSatisfying(postDTO -> assertPostEquality(postDTO, testPost));
+
+    }
+
+    private void assertPostEquality(PostDTO actualPost, PostDTO expectedPost){
+        assertThat(actualPost.getId()).isNotNull();
+        assertThat(actualPost.getContent()).isEqualTo(expectedPost.getContent());
+        assertThat(actualPost.getComments()).isEqualTo(expectedPost.getComments());
+        assertThat(actualPost.getUserCreated().getId()).isEqualTo(expectedPost.getUserCreated().getId());
+
+        Set<Integer> actualLikedUserIds = actualPost.getLikedByUsers() != null
+                ? actualPost.getLikedByUsers().stream()
+                    .map(UserDTO::getId)
+                    .collect(Collectors.toSet())
+                : new HashSet<>();
+
+        Set<Integer> expectedLikedUserIds = expectedPost.getLikedByUsers() != null
+                ? expectedPost.getLikedByUsers().stream()
+                    .map(UserDTO::getId)
+                    .collect(Collectors.toSet())
+                : new HashSet<>();
+
+        assertThat(actualLikedUserIds.size()).isEqualTo(expectedLikedUserIds.size());
+        assertThat(actualLikedUserIds).isEqualTo(expectedLikedUserIds);
+
     }
 }

@@ -1,10 +1,8 @@
 package com.social.join.service;
 
-import com.social.join.dtos.CommentDTO;
-import com.social.join.dtos.HashtagDTO;
 import com.social.join.dtos.PostDTO;
 import com.social.join.dtos.UserDTO;
-import com.social.join.entities.User;
+import com.social.join.service.exceptions.PostNotFoundException;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -15,11 +13,11 @@ public interface IPostService {
 
     /**
      * Creates a post made by a user
-     * @param user  the user that creates the post
-     * @param postDTO  the {@link PostDTO} instance to create the Post
-     * @return  the new {@link PostDTO} instance with the given id
+     *
+     * @param postDTO the {@link PostDTO} instance to create the Post
+     * @return the new {@link PostDTO} instance with the given id
      */
-    PostDTO createPost(User user, PostDTO postDTO);
+    PostDTO savePost(PostDTO postDTO);
 
     /**
      * Gets Posts made by specific User's id {@link  com.social.join.entities.User}
@@ -54,26 +52,11 @@ public interface IPostService {
     Optional<PostDTO> updatePostById(int id, PostDTO postDTO);
 
     /**
-     * Gets all the comments  of a {@link com.social.join.entities.Post}
-     * searched by Post's id.
-     * @param id    the {@link com.social.join.entities.Post}'s id
-     * @return  a list of {@link CommentDTO } instances
-     */
-    List<CommentDTO> getAllTheCommentsByPostId(int id);
-
-    /**
-     * Gets all the hashtags a Post has
-     * @param id    the id of the {@link com.social.join.entities.Post} instance to search
-     * @return  a list of {@link HashtagDTO} instances
-     */
-    List<HashtagDTO> getAllTheHashtagsByPostId(int id);
-
-    /**
      * Gets the Users that liked the Post
      * @param id    the {@link com.social.join.entities.Post} id to search the likes
      * @return  a list of {@link UserDTO} instances
      */
-    List<UserDTO> getUsersThatLikedByPostId(int id);
+    List<UserDTO> getUsersThatLikedByPostId(int id) throws PostNotFoundException;
 
 
 
