@@ -57,7 +57,7 @@ public class User {
             joinColumns = @JoinColumn(name = "USER_ID"),
             inverseJoinColumns = @JoinColumn(name = "POST_ID")
     )
-    private Set<Post> likedPosts = new HashSet<>();
+    private Set<Post> likedPosts;
 
     @ManyToMany
     @JoinTable(
@@ -65,5 +65,7 @@ public class User {
             joinColumns = @JoinColumn(name = "USER_ID"),
             inverseJoinColumns = @JoinColumn(name = "COMMENT_ID")
     )
-    private Set<Comment> likedComments = new HashSet<>();
+    private Set<Comment> likedComments;
+
+
 }

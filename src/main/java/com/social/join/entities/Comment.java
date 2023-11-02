@@ -15,6 +15,7 @@ import java.util.UUID;
 
 @Builder
 @Data
+@ToString()
 @Entity
 @NoArgsConstructor
 @AllArgsConstructor
@@ -34,10 +35,7 @@ public class Comment {
 
     @ManyToOne
     @JoinColumn(name = "POST_ID", referencedColumnName = "ID", nullable = false)
-    private Post post;
-
-//    @ManyToMany
-//    private Set<Hashtag> hashtag = new HashSet<>();
+    private Post post ;
 
     @ManyToMany(mappedBy = "likedComments")
     private Set<User> likedByUsers;

@@ -18,6 +18,7 @@ import java.util.*;
 @NoArgsConstructor
 @AllArgsConstructor
 public class Post {
+
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(updatable = false, nullable = false)
@@ -33,8 +34,9 @@ public class Post {
     @JoinColumn(name = "USER_ID", referencedColumnName = "ID")
     private User userCreated;
 
-    @OneToMany(mappedBy = "post", fetch = FetchType.EAGER)
-    private List<Comment> comments;
+    @Builder.Default    // Lombok will Initialize empty HashSet()
+    @OneToMany(mappedBy = "post")
+    private Set<Comment> comments = new HashSet<>();
 
     @ManyToMany(mappedBy = "likedPosts")
     private Set<User> likedByUsers;
@@ -46,4 +48,18 @@ public class Post {
     @UpdateTimestamp
     @Column(name = "UPDATED_DATE")
     private LocalDateTime updatedDate;
+
+    public boolean addComment(Comment comment) {
+        if (comment == null) {
+            return false;  // Comment is null, not added
+        }
+
+        if (comments.contains(comment)) {
+            return false;  // Comment already exists, not added
+        }
+
+        this.comments.add(comment);
+        comment.setPost(this);
+        return true;  // Comment added
+    }
 }
