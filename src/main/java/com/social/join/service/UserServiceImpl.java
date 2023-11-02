@@ -1,6 +1,8 @@
 package com.social.join.service;
 
+import com.social.join.dtos.UserCreateRequest;
 import com.social.join.dtos.UserDTO;
+import com.social.join.dtos.UserUpdateRequest;
 import com.social.join.entities.User;
 import com.social.join.mappers.IUserMapper;
 import com.social.join.repositories.IUserRepository;
@@ -57,21 +59,23 @@ public class UserServiceImpl implements IUserService {
     }
 
     @Override
-    public UserDTO saveNewUser(UserDTO userDTO) {
-        return userMapper.userToUserDTO(userRepository.save(userMapper.userDTOToUser(userDTO)));
+    public UserDTO createUser(UserCreateRequest userCreateRequest) {
+        return userMapper.userToUserDTO(
+                userRepository.save( userMapper.userCreateRequestToUser(userCreateRequest) )
+        );
     }
 
     @Override
-    public Optional<UserDTO> updateUserById(int id, UserDTO userDTO) {
+    public Optional<UserDTO> updateUser(int id, UserUpdateRequest userUpdateRequest) {
         AtomicReference<Optional<UserDTO>> atomicReference = new AtomicReference<>();
 
         userRepository.findById(id).ifPresentOrElse(foundUser -> {
-            foundUser.setFirstname(userDTO.getFirstname());
-            foundUser.setUsername(userDTO.getUsername());
-            foundUser.setLastname(userDTO.getLastname());
-            foundUser.setPassword(userDTO.getPassword());
-            foundUser.setVersion(userDTO.getVersion());
-            foundUser.setEmail(userDTO.getEmail());
+            foundUser.setFirstname(userUpdateRequest.getFirstname());
+            foundUser.setUsername(userUpdateRequest.getUsername());
+            foundUser.setLastname(userUpdateRequest.getLastname());
+            foundUser.setPassword(userUpdateRequest.getPassword());
+            foundUser.setVersion(userUpdateRequest.getVersion());
+            foundUser.setEmail(userUpdateRequest.getEmail());
             atomicReference.set(Optional.of(userMapper.userToUserDTO(userRepository.save(foundUser))));
         }, () -> {
             atomicReference.set(Optional.empty());
@@ -81,7 +85,7 @@ public class UserServiceImpl implements IUserService {
     }
 
     @Override
-    public Boolean deleteById(int id) {
+    public Boolean deleteUser(int id) {
         if (userRepository.existsById(id)) {
             userRepository.deleteById(id);
             return true;

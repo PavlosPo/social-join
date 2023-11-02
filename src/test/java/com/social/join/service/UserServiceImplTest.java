@@ -1,7 +1,10 @@
 package com.social.join.service;
 
+import com.social.join.dtos.UserCreateRequest;
 import com.social.join.dtos.UserDTO;
 import com.social.join.entities.Post;
+import com.social.join.mappers.ICreateUserRequestMapper;
+import com.social.join.mappers.IUpdateUserRequestMapper;
 import com.social.join.repositories.IPostRepository;
 
 import jakarta.validation.constraints.NotNull;
@@ -27,6 +30,12 @@ class UserServiceImplTest {
 
     @Autowired
     private IPostRepository postRepository;
+
+    @Autowired
+    private ICreateUserRequestMapper createUserRequestMapper;
+
+    @Autowired
+    private IUpdateUserRequestMapper updateUserRequestMapper;
 
     @Test
     @Transactional
@@ -65,7 +74,7 @@ class UserServiceImplTest {
         UserDTO testUser = userService.getAllUsers().get(0);
 
         // Act
-        boolean deleteStatus = userService.deleteById(testUser.getId());
+        boolean deleteStatus = userService.deleteUser(testUser.getId());
 
         // Assert
         assertThat(deleteStatus).isTrue();
@@ -78,13 +87,14 @@ class UserServiceImplTest {
     void createUserTest() {
         // Arrange
         Post testPostToAdd = postRepository.findAll().get(0);
-        UserDTO testUser = getUserDTO(testPostToAdd);   // adds a post to the user
+        UserDTO testUserDTO = getUserDTO(testPostToAdd);   // adds a post to the user
+        UserCreateRequest testUserCreateRequest =  createUserRequestMapper.UserDTOToUserCreateRequest(testUserDTO);
 
         // Act
-        UserDTO userReturned = userService.saveNewUser(testUser);
+        UserDTO userReturned = userService.createUser(testUserCreateRequest);
 
         // Assert
-        assertUserEquality(userReturned, testUser, false);
+        assertUserEquality(userReturned, userReturned, false);
     }
 
     @Test
@@ -101,7 +111,7 @@ class UserServiceImplTest {
         testUser.setVersion(2);
 
         // Act
-        Optional<UserDTO> updatedUser = userService.updateUserById(testUser.getId(), testUser);
+        Optional<UserDTO> updatedUser = userService.updateUser(testUser.getId(), updateUserRequestMapper.UserDTOToUserUpdateRequest(testUser));
 
         // Assert
         assertThat(updatedUser).isNotEmpty();

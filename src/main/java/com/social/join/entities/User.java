@@ -38,6 +38,14 @@ public class User {
     @NotBlank
     private String username;
 
+    @ManyToMany
+    @JoinTable(
+            name = "USER_FRIENDS",
+            joinColumns = @JoinColumn(name = "USER_ID"),
+            inverseJoinColumns = @JoinColumn(name = "FRIEND_ID")
+    )
+    private Set<User> friends = new HashSet<>();
+
     @NotNull
     @NotBlank
     @Email(message = "Email Error")
@@ -47,9 +55,6 @@ public class User {
     @NotBlank
     @Size(min = 6)
     private String password;
-
-//    @OneToMany(mappedBy = "userCreated")
-//    private Set<Post> postsMadeByUser = new HashSet<>();
 
     @ManyToMany
     @JoinTable(

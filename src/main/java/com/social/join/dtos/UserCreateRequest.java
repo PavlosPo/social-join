@@ -1,33 +1,24 @@
 package com.social.join.dtos;
 
-import com.social.join.entities.Comment;
-import com.social.join.entities.Post;
-import jakarta.persistence.*;
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Size;
 import lombok.*;
 
-import java.util.HashSet;
-import java.util.Set;
-
-@Getter
 @Setter
-@Builder
-@NoArgsConstructor
+@Getter
 @AllArgsConstructor
-public class UserDTO {
-
-    @Id
-    private Integer id;
-
-    private Integer version;
+@NoArgsConstructor
+@Builder
+public class UserCreateRequest {
+    private  Integer id;
 
     @NotNull
     @NotBlank
     private String firstname;
 
+    @NotNull
     @NotBlank
     private String lastname;
 
@@ -45,7 +36,5 @@ public class UserDTO {
     @Size(min = 6)
     private String password;
 
-    private Set<Post> likedPosts = new HashSet<>();
-
-    private Set<Comment> likedComments = new HashSet<>();
 }
+
