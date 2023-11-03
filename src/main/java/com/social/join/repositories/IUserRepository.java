@@ -2,15 +2,18 @@ package com.social.join.repositories;
 
 
 import com.social.join.entities.User;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
-import org.springframework.stereotype.Repository;
-
-import java.util.List;
 
 public interface IUserRepository extends JpaRepository<User, Integer> {
 
-    List<User> findAllByFirstnameLikeIgnoreCase(String firstname);
-    List<User> findAllByUsernameLikeIgnoreCase(String username);
-    List<User> findAllByLastnameLikeIgnoreCase(String lastname);
+    Page<User> findAllByFirstnameLikeIgnoreCase(String firstname, Pageable pageable);
+    Page<User> findAllByUsernameLikeIgnoreCase(String username, Pageable pageable);
+    Page<User> findAllByLastnameLikeIgnoreCase(String lastname, Pageable pageable);
     // List<User> findAllByFirstnameLikeIgnoreCaseAndLastnameLikeIgnoreCase(String firstname, String lastname);
+
+    Page<User> findAllByUsernameLikeIgnoreCaseAndAndFirstnameLikeIgnoreCase(String username, String firstname, Pageable pageable);
+    Page<User> findAllByUsernameLikeIgnoreCaseAndLastnameLikeIgnoreCase(String username, String lastname, Pageable pageable);
+
 }

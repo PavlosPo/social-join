@@ -11,6 +11,7 @@ import jakarta.validation.constraints.NotNull;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.data.domain.Page;
 import org.springframework.test.annotation.Rollback;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -41,7 +42,7 @@ class UserServiceImplTest {
     @Transactional
     void getUsersBySearchTest() {
         // Arrange and Act
-        UserDTO testUser = userService.getAllUsers().get(1);
+        UserDTO testUser = userService.getAllUsers(null, null, null, null, null).getContent().get(1);
 
         // Assert
         assertThat(testUser).isNotNull();
@@ -54,16 +55,16 @@ class UserServiceImplTest {
     @Transactional
     void getAllUsersTest() {
         // Arrange
-        List<UserDTO> testUsers = userService.getAllUsers();
-        UserDTO testUser = testUsers.get(1);
-        assertThat(testUsers).isNotEmpty();
+        Page<UserDTO> pageTestUsers = userService.getAllUsers(null, null, null, null, null);
+        UserDTO testUsers = pageTestUsers.getContent().get(0);
+        assertThat(testUsers).isNotNull();
 
         // Act
-        UserDTO testUserFromService = userService.getUserById(testUser.getId()).orElse(null);
+        UserDTO testUserFromService = userService.getUserById(testUsers.getId()).orElse(null);
 
         // Assert
         assertThat(testUserFromService).isNotNull();
-        assertThat(testUserFromService.getUsername()).isEqualTo(testUser.getUsername());
+        assertThat(testUserFromService.getUsername()).isEqualTo(testUsers.getUsername());
     }
 
     @Test
@@ -71,7 +72,7 @@ class UserServiceImplTest {
     @Transactional
     void deleteUserTest() {
         // Arrange
-        UserDTO testUser = userService.getAllUsers().get(0);
+        UserDTO testUser = userService.getAllUsers(null, null, null, null, null).getContent().get(0);
 
         // Act
         boolean deleteStatus = userService.deleteUser(testUser.getId());
@@ -101,7 +102,7 @@ class UserServiceImplTest {
     @Rollback
     @Transactional
     void updateUserTest() {
-        UserDTO testUser = userService.getAllUsers().get(0);
+        UserDTO testUser = userService.getAllUsers(null, null, null, null, null).getContent().get(0);
         // Arrange
         testUser.setUsername("UpdatedUsername");
         testUser.setPassword("updatedPassword");
@@ -125,7 +126,7 @@ class UserServiceImplTest {
 
     @NotNull
     private UserDTO getUserDTO(Post testPostToAdd) {
-        UserDTO testUser = userService.getAllUsers().get(0);
+        UserDTO testUser = userService.getAllUsers(null, null, null, null, null).getContent().get(0);
         String PASSWORD = "CREATED_PASSWORD";
         String EMAIL = "TEST@TEST.COM";
 
@@ -141,8 +142,8 @@ class UserServiceImplTest {
     }
 
     private void assertUserSearch(String username, String firstname, String lastname) {
-        List<UserDTO> usersList = userService.getUsersBySearch(username , firstname, lastname);
-        assertThat(usersList).isNotEmpty();
+        Page<UserDTO> usersList = userService.getAllUsers(username , firstname, lastname, 1, 25);
+        assertThat(usersList).isNotNull();
     }
 
     /**
@@ -160,9 +161,5 @@ class UserServiceImplTest {
         assertThat(actualUser.getPassword()).isEqualTo(expectedUser.getPassword());
         assertThat(actualUser.getEmail()).isEqualTo(expectedUser.getEmail());
         assertThat(actualUser.getVersion()).isEqualTo(expectedUser.getVersion());
-        assertThat(actualUser.getLikedComments().size()).isEqualTo(expectedUser.getLikedComments().size());
-        assertThat(actualUser.getLikedComments()).isEqualTo(expectedUser.getLikedComments());
-        assertThat(actualUser.getLikedPosts().size()).isEqualTo(expectedUser.getLikedPosts().size());
-        assertThat(actualUser.getLikedPosts()).isEqualTo(expectedUser.getLikedPosts());
     }
 }

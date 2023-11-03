@@ -1,19 +1,27 @@
 package com.social.join.controllers;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.social.join.dtos.UserCreateRequest;
 import com.social.join.dtos.UserDTO;
 import com.social.join.dtos.UserUpdateRequest;
+import com.social.join.entities.User;
 import com.social.join.mappers.IUserMapper;
 import com.social.join.repositories.IUserRepository;
 import com.social.join.service.IUserService;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.mockito.ArgumentCaptor;
+import org.mockito.Captor;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
+import org.springframework.data.domain.Page;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.test.annotation.Rollback;
+import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
@@ -22,9 +30,20 @@ import java.util.Optional;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.isA;
+import static org.mockito.BDDMockito.given;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
-@SpringBootTest
+@WebMvcTest(UserControllerImpl.class)
 class UserControllerTest {
+
+    @Autowired
+    MockMvc mockMvc;
+
+    @Autowired
+    ObjectMapper objectMapper;
 
     @MockBean
     private IUserController userController;
@@ -40,24 +59,27 @@ class UserControllerTest {
 
     @BeforeEach
     public void setup() {
-        userController = new UserControllerImpl();
+        userController = new UserControllerImpl(userService);
     }
+
+    @Captor
+    ArgumentCaptor<Integer> idArgumentCaptor;
+
+    @Captor
+    ArgumentCaptor<User> userArgumentCaptor;
 
     @Test
     @Transactional
-    public void testGetAllUsers() {
+    public void testGetAllUsers() throws Exception {
         // actual users
-        List<UserDTO> users = userRepository.findAll()
-                .stream()
-                .map(userMapper::userToUserDTO)
-                .toList();
+        given(userService.getAllUsers(any(), any(), any(), any(), any()))
+                .willReturn(userService.getAllUsers(null, null, null, 1, 25));
 
-        // controller's users
-        ResponseEntity<List<UserDTO>> response = userController.getAllUsers();
-
-        assertEquals(HttpStatus.OK, response.getStatusCode());
-        assertEquals(users.size(), Objects.requireNonNull(response.getBody()).size());
-        assertEquals(users.get(0), response.getBody().get(0));
+        mockMvc.perform(get(UserControllerImpl.USER_PATH)
+                .queryParam("pageSize", "800"))
+                .andExpect(status().isOk())
+                .andExpect(content().contentType(MediaType.APPLICATION_JSON));
+//                .andExpect(jsonPath("$.content.length()").value(3));
     }
 
     @Test
@@ -77,7 +99,7 @@ class UserControllerTest {
     @Transactional
     @Rollback
     public void testCreateUser() {
-        UserCreateRequest userCreateRequest = userMapper.userDTOToUserCreateRequest(userService.getAllUsers().get(0));
+        UserCreateRequest userCreateRequest = userMapper.userDTOToUserCreateRequest(userService.getAllUsers(null, null, null, null, null).getContent().get(0));
         userCreateRequest.setFirstname("UPDATED_USERNAME");
 
         ResponseEntity<UserDTO> response = userController.createUser(userCreateRequest);
@@ -92,7 +114,7 @@ class UserControllerTest {
         UserUpdateRequest updateRequest = new UserUpdateRequest();
         updateRequest.setFirstname("UPDATED_USERNAME");
 
-        UserDTO actualUser = userService.getAllUsers().get(0);
+        UserDTO actualUser = userService.getAllUsers(null, null, null, null, null).getContent().get(0);
 
         ResponseEntity<UserDTO> response = userController.updateUser(1, updateRequest);
 

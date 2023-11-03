@@ -3,8 +3,8 @@ package com.social.join.controllers;
 import com.social.join.dtos.UserCreateRequest;
 import com.social.join.dtos.UserDTO;
 import com.social.join.dtos.UserUpdateRequest;
+import org.springframework.data.domain.Page;
 import org.springframework.http.ResponseEntity;
-import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -13,7 +13,11 @@ import java.util.List;
 public interface IUserController {
 
     @GetMapping("/users")
-    ResponseEntity<List<UserDTO>> getAllUsers();
+    Page<UserDTO> getAllUsers(@RequestParam(value = "username", required = false) String username,
+                                              @RequestParam(value = "firstname", required = false) String firstname,
+                                              @RequestParam(value = "lastname", required = false) String lastname,
+                                              @RequestParam(value = "pageNumber", required = false) Integer pageNumber,
+                                              @RequestParam(value = "pageSize", required = false) Integer pageSize);
 
     @GetMapping("/users/{id}")
     ResponseEntity<UserDTO> getUserById(@PathVariable Integer id);
