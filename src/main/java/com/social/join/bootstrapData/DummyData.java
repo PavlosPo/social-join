@@ -23,13 +23,17 @@ public class DummyData implements CommandLineRunner {
     private final IHashtagRepository hashtagRepository;
     private final ICommentRepository commentRepository;
 
+    private List<User> usersToSave;
+    private List<Post> postsToSave;
+    private List<Comment> commentsToSave;
+    List<Hashtag> hashtagsToSave;
 
     @Override
     public void run(String... args) throws Exception {
-        List<User> usersToSave = DummyDataGenerator.generateUsers(10);
-        List<Post> postsToSave = DummyDataGenerator.generatePosts(usersToSave, 10);
-        List<Comment> commentsToSave = DummyDataGenerator.generateComments(usersToSave, postsToSave, 10);
-        List<Hashtag> hashtagsToSave = DummyDataGenerator.generateHashtags(10);
+        usersToSave = DummyDataGenerator.generateUsers(10);
+        postsToSave = DummyDataGenerator.generatePosts(usersToSave, 10);
+        commentsToSave = DummyDataGenerator.generateComments(usersToSave, postsToSave, 10);
+        hashtagsToSave = DummyDataGenerator.generateHashtags(10);
 
         userRepository.saveAll(usersToSave);
         postRepository.saveAll(postsToSave);
@@ -42,4 +46,7 @@ public class DummyData implements CommandLineRunner {
     }
 
 
+    public Object getAllUsers(Object any, Object any1, Object any2, Object any3, Object any4) {
+        return usersToSave;
+    }
 }

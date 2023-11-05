@@ -22,8 +22,6 @@ public class UserDTO {
     @Id
     private Integer id;
 
-    private Integer version;
-
     @NotNull
     @NotBlank
     private String firstname;

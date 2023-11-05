@@ -36,10 +36,11 @@ public class Post {
 
     @Builder.Default    // Lombok will Initialize empty HashSet()
     @OneToMany(mappedBy = "post")
-    private Set<Comment> comments = new HashSet<>();
+    private List<Comment> comments = new ArrayList<>();
 
+    @Builder.Default
     @ManyToMany(mappedBy = "likedPosts")
-    private Set<User> likedByUsers;
+    private List<User> usersWhoLikedThisPost = new ArrayList<>();
 
     @CreationTimestamp
     @Column(name = "CREATED_DATE")
@@ -49,7 +50,7 @@ public class Post {
     @Column(name = "UPDATED_DATE")
     private LocalDateTime updatedDate;
 
-    public boolean addComment(Comment comment) {
+    public boolean setComment(Comment comment) {
         if (comment == null) {
             return false;  // Comment is null, not added
         }

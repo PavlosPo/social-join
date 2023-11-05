@@ -137,7 +137,7 @@ class PostControllerTest {
         assertEquals(actualPostDTO.getContent(), postDTO.getContent());
         assertEquals(actualPostDTO.getComments(), postDTO.getComments());
         assertEquals(actualPostDTO.getUserCreated(), postDTO.getUserCreated());
-        assertEquals(actualPostDTO.getLikedByUsers(), postDTO.getLikedByUsers());
+        assertEquals(actualPostDTO.getUsersWhoLikedThisPost(), postDTO.getUsersWhoLikedThisPost());
         assertEquals(actualPostDTO.getCreatedDate(), postDTO.getCreatedDate());
     }
 

@@ -12,7 +12,6 @@ import lombok.*;
 @NoArgsConstructor
 @Builder
 public class UserCreateRequest {
-    private  Integer id;
 
     @NotNull
     @NotBlank

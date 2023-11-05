@@ -109,7 +109,6 @@ class UserServiceImplTest {
         testUser.setLastname("updatedLastname");
         testUser.setFirstname("updatedFirstname");
         testUser.setEmail("updatedEmail@test.com");
-        testUser.setVersion(2);
 
         // Act
         Optional<UserDTO> updatedUser = userService.updateUser(testUser.getId(), updateUserRequestMapper.UserDTOToUserUpdateRequest(testUser));
@@ -135,7 +134,6 @@ class UserServiceImplTest {
         testUser.setFirstname("testFirstname");
         testUser.setLastname("testLastname");
         testUser.setPassword(PASSWORD);
-        testUser.setVersion(1);
         testUser.setLikedPosts(Set.of(testPostToAdd));
         testUser.setEmail(EMAIL);
         return testUser;
@@ -160,6 +158,5 @@ class UserServiceImplTest {
         assertThat(actualUser.getFirstname()).isEqualTo(expectedUser.getFirstname());
         assertThat(actualUser.getPassword()).isEqualTo(expectedUser.getPassword());
         assertThat(actualUser.getEmail()).isEqualTo(expectedUser.getEmail());
-        assertThat(actualUser.getVersion()).isEqualTo(expectedUser.getVersion());
     }
 }

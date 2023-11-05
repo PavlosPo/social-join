@@ -6,6 +6,7 @@ import jakarta.validation.constraints.NotNull;
 import lombok.*;
 
 import java.time.LocalDateTime;
+import java.util.List;
 import java.util.Set;
 
 @Getter
@@ -25,12 +26,12 @@ public class CommentDTO {
     @NotNull
     private PostDTO post;
 
-    private Set<HashtagDTO> hashtag;
+    private List<HashtagDTO> hashtag;
 
     @NotNull
     private UserDTO userCreatedIt;
 
-    private Set<UserDTO> likedByUsers;
+    private List<UserDTO> usersWhoLikedThisComment;
 
     private LocalDateTime createdDate;
     private LocalDateTime updateDate;

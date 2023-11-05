@@ -4,24 +4,29 @@ import com.social.join.dtos.UserCreateRequest;
 import com.social.join.dtos.UserDTO;
 import com.social.join.dtos.UserUpdateRequest;
 import com.social.join.service.IUserService;
+import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotNull;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.List;
+import java.util.Optional;
 
 @RequiredArgsConstructor
 @RestController
 @Slf4j
+@RequestMapping("/users")
 public class UserControllerImpl implements IUserController{
 
-    public static final String USER_PATH = "/users";
-    public static final String USER_PATH_ID = USER_PATH + "{userId}";
     private final IUserService userService;
 
-    @Override
+
+    @GetMapping
     public Page<UserDTO> getAllUsers(
             @RequestParam(value = "username", required = false) String username,
             @RequestParam(value = "firstname", required = false) String firstname,
@@ -31,23 +36,49 @@ public class UserControllerImpl implements IUserController{
         return userService.getAllUsers(username, firstname, lastname, pageNumber, pageSize);
     }
 
-    @Override
-    public ResponseEntity<UserDTO> getUserById(Integer id) {
-        return null;
+
+    @GetMapping("/{userId}")
+    public ResponseEntity<UserDTO> getUserById(@PathVariable("userId") Integer userId) {
+        log.debug("Get User by Id - in controller");
+        UserDTO userDTO = userService.getUserById(userId)
+                .orElseThrow(() -> new NotFoundException("The user does not exist"));
+        return ResponseEntity.ok(userDTO);
     }
 
-    @Override
-    public ResponseEntity<UserDTO> createUser(UserCreateRequest userCreateRequest) {
-        return null;
+
+    @PostMapping
+    public ResponseEntity<UserDTO> createUser(@Validated @RequestBody UserCreateRequest userCreateRequest) {
+        UserDTO savedUser = userService.createUser(userCreateRequest);
+        HttpHeaders headers = new HttpHeaders();
+        headers.add("Location", "/users/" + savedUser.getId());
+        return ResponseEntity.status(HttpStatus.CREATED).headers(headers).body(savedUser);
     }
 
-    @Override
-    public ResponseEntity<UserDTO> updateUser(Integer id, UserUpdateRequest userUpdateRequest) {
-        return null;
+
+    @PatchMapping("/{userId}")
+    public ResponseEntity<UserDTO> updateUser(
+            @PathVariable("userId") Integer id,
+            @Validated @RequestBody UserUpdateRequest userUpdateRequest) {
+
+        if (userUpdateRequest.getId() == null){
+            throw new NotFoundException("The user id to update does not exist");
+        }
+
+        Optional<UserDTO> updatedUser = userService.updateUser(id, userUpdateRequest);
+        if (updatedUser.isEmpty()) {
+            throw new NotFoundException("The user to update does not exist");
+        }
+
+        return ResponseEntity.status(HttpStatus.OK).body(updatedUser.get());
     }
 
-    @Override
-    public ResponseEntity<Boolean> deleteUser(Integer id) {
-        return null;
+
+    @DeleteMapping("/{userId}")
+    public ResponseEntity<Boolean> deleteUser(@PathVariable("userId") Integer id) {
+        if (!userService.deleteUser(id)) {
+            throw new NotFoundException("The user id to delete does not exists");
+        }
+
+        return ResponseEntity.status(HttpStatus.NO_CONTENT).build();
     }
 }

@@ -57,7 +57,7 @@ public class PostServiceImpl implements IPostService {
         postRepository.findById(id).ifPresentOrElse(foundPost -> {
             Post mappedPost = postMapper.postDTOToPost(postDTO);
             foundPost.setContent(mappedPost.getContent());
-            foundPost.setLikedByUsers(mappedPost.getLikedByUsers());
+            foundPost.setUsersWhoLikedThisPost(mappedPost.getUsersWhoLikedThisPost());
             foundPost.setComments(mappedPost.getComments());
             foundPost.setUpdatedDate(LocalDateTime.now());
             atomicReference.set(Optional.of(postMapper.postToPostDTO(postRepository.save(foundPost))));
@@ -78,7 +78,7 @@ public class PostServiceImpl implements IPostService {
         }
 
         foundPost.ifPresent(post -> {
-            atomicReference.set(post.getLikedByUsers()
+            atomicReference.set(post.getUsersWhoLikedThisPost()
                     .stream()
                     .map(userMapper::userToUserDTO)
                     .collect(Collectors.toList()));

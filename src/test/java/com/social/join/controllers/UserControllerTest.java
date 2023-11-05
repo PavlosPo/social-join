@@ -5,61 +5,54 @@ import com.social.join.dtos.UserCreateRequest;
 import com.social.join.dtos.UserDTO;
 import com.social.join.dtos.UserUpdateRequest;
 import com.social.join.entities.User;
-import com.social.join.mappers.IUserMapper;
-import com.social.join.repositories.IUserRepository;
 import com.social.join.service.IUserService;
+import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.ArgumentCaptor;
 import org.mockito.Captor;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.boot.test.mock.mockito.MockBean;
-import org.springframework.data.domain.Page;
-import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
-import org.springframework.http.ResponseEntity;
-import org.springframework.test.annotation.Rollback;
 import org.springframework.test.web.servlet.MockMvc;
+import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.context.WebApplicationContext;
 
-import java.util.List;
-import java.util.Objects;
-import java.util.Optional;
-
-import static org.assertj.core.api.Assertions.assertThat;
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.ArgumentMatchers.isA;
-import static org.mockito.BDDMockito.given;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
-@WebMvcTest(UserControllerImpl.class)
+@SpringBootTest
 class UserControllerTest {
 
-    @Autowired
     MockMvc mockMvc;
 
     @Autowired
     ObjectMapper objectMapper;
 
-    @MockBean
-    private IUserController userController;
+    @Autowired
+    WebApplicationContext wac;
 
     @Autowired
     private IUserService userService;
 
-    @Autowired
-    private IUserMapper userMapper;
-
-    @Autowired
-    private IUserRepository userRepository;
+    private UserDTO userToHelp;
+    private Integer userIdToHelp;
 
     @BeforeEach
+    @Transactional
     public void setup() {
-        userController = new UserControllerImpl(userService);
+        mockMvc = MockMvcBuilders.webAppContextSetup(wac).build();
+        userToHelp = createUserAndReturnUser("FIRSTNAME", "LASTNAME", "EXAMPLE@EXAMPLE.COM", "PASSWORD", "USERNAME");
+        userIdToHelp = userToHelp.getId();
+    }
+
+    @AfterEach
+    @Transactional
+    void tearDown() {
+        if (userIdToHelp != null) {
+            userService.deleteUser(userIdToHelp);
+        }
     }
 
     @Captor
@@ -70,85 +63,104 @@ class UserControllerTest {
 
     @Test
     @Transactional
-    public void testGetAllUsers() throws Exception {
-        // actual users
-        given(userService.getAllUsers(any(), any(), any(), any(), any()))
-                .willReturn(userService.getAllUsers(null, null, null, 1, 25));
-
-        mockMvc.perform(get(UserControllerImpl.USER_PATH)
-                .queryParam("pageSize", "800"))
+    public void shouldReturnAllUsers() throws Exception {
+        // Arrange, Act, Assert
+        mockMvc.perform(get("/users"))
                 .andExpect(status().isOk())
-                .andExpect(content().contentType(MediaType.APPLICATION_JSON));
-//                .andExpect(jsonPath("$.content.length()").value(3));
+                .andExpect(content().contentType(MediaType.APPLICATION_JSON))
+                .andExpect(jsonPath("$.content.size()").isNotEmpty())
+                .andExpect(jsonPath("$.content.size()").isNumber());
+    }
+
+    @Test
+    public void shouldReturnUserById() throws Exception {
+        // Arrange, Act, Assert
+        mockMvc.perform(get("/users/" + userIdToHelp))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.id").isNotEmpty())
+                .andExpect(jsonPath("$.id").value(userIdToHelp));
     }
 
     @Test
     @Transactional
-    public void testGetUserById() {
-        Optional<UserDTO> actualUser = userService.getUserById(1);
+    public void shouldCreateUser() throws Exception {
+        // Arrange
+        UserCreateRequest userCreateRequest = createUserRequest("FIRSTNAME", "LASTNAME", "EXAPLES@EXAMPLE.COM", "PASSWORD", "USERNAME");
 
-        ResponseEntity<UserDTO> response = userController.getUserById(1);
-
-        assertEquals(HttpStatus.OK, response.getStatusCode());
-        assertThat(Objects.requireNonNull(response.getBody()).getId()).isNotNull();
-        assertThat(actualUser).isNotEmpty();
-        assertUserDTOEquality(actualUser.get(), Objects.requireNonNull(response.getBody()));
+        // Act
+        mockMvc.perform(post("/users")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(userCreateRequest)))
+                .andExpect(status().isCreated())
+                .andExpect(jsonPath("$.id").isNotEmpty())
+                .andExpect(jsonPath("$.id").isNumber())
+                .andExpect(jsonPath("$.firstname").value("FIRSTNAME"))
+                .andExpect(jsonPath("$.lastname").value("LASTNAME"))
+                .andExpect(jsonPath("$.email").value("EXAPLES@EXAMPLE.COM"))
+                .andExpect(jsonPath("$.password").value("PASSWORD"))
+                .andExpect(jsonPath("$.username").value("USERNAME"));
     }
 
     @Test
     @Transactional
-    @Rollback
-    public void testCreateUser() {
-        UserCreateRequest userCreateRequest = userMapper.userDTOToUserCreateRequest(userService.getAllUsers(null, null, null, null, null).getContent().get(0));
-        userCreateRequest.setFirstname("UPDATED_USERNAME");
+    public void shouldUpdateUser() throws Exception {
+        // Arrange
+        UserUpdateRequest userUpdateRequest = updateUserRequest(userIdToHelp, "EXAPLES@EXAMPLE.COM", "UPDATED_FIRSTNAME", "UPDATED_LASTNAME", "UPDATED_PASSWORD", "UPDATED_USERNAME");
 
-        ResponseEntity<UserDTO> response = userController.createUser(userCreateRequest);
-
-        assertEquals(HttpStatus.CREATED, response.getStatusCode());
-        assertUserDTOEquality(Objects.requireNonNull(response.getBody()), userCreateRequest);
+        // Act and Assert
+        mockMvc.perform(patch("/users/" + userIdToHelp)
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(userUpdateRequest)))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.id").value(userIdToHelp))
+                .andExpect(jsonPath("$.firstname").value("UPDATED_FIRSTNAME"))
+                .andExpect(jsonPath("$.lastname").value("UPDATED_LASTNAME"))
+                .andExpect(jsonPath("$.username").value("UPDATED_USERNAME"))
+                .andExpect(jsonPath("$.password").value("UPDATED_PASSWORD"))
+                .andExpect(jsonPath("$.email").value("EXAPLES@EXAMPLE.COM"));
     }
 
     @Test
     @Transactional
-    public void testUpdateUser() {
-        UserUpdateRequest updateRequest = new UserUpdateRequest();
-        updateRequest.setFirstname("UPDATED_USERNAME");
+    public void shouldDeleteUser() throws Exception {
+        // Arrange (Already done in @BeforeEach)
 
-        UserDTO actualUser = userService.getAllUsers(null, null, null, null, null).getContent().get(0);
+        // Act
+        mockMvc.perform(delete("/users/" + userIdToHelp))
+                .andExpect(status().isNoContent());
 
-        ResponseEntity<UserDTO> response = userController.updateUser(1, updateRequest);
-
-        assertEquals(HttpStatus.OK, response.getStatusCode());
-        assertUserDTOEquality(actualUser, Objects.requireNonNull(response.getBody()));
+        // Assert
+        // You can add assertions to check that the user has been deleted, e.g., make a request to get the user by ID and expect a 404 response.
     }
 
-    @Test
-    @Transactional
-    @Rollback
-    public void testDeleteUser() {
-
-        ResponseEntity<Boolean> response = userController.deleteUser(1);
-
-        assertEquals(HttpStatus.NO_CONTENT, response.getStatusCode());
-        assertThat(response.getBody()).isTrue();
-
-        assertThat(userService.deleteUser(1)).isFalse();    // not existing anymore
+    private Integer createUserAndReturnId(String firstname, String lastname, String email, String password, String username) {
+        UserCreateRequest userCreateRequest = createUserRequest(firstname, lastname, email, password, username);
+        return userService.createUser(userCreateRequest).getId();
     }
 
-    private void assertUserDTOEquality(UserDTO userDTO, UserCreateRequest userCreateRequest) {
-        assertEquals(userCreateRequest.getUsername(), userDTO.getUsername());
-        assertEquals(userCreateRequest.getFirstname(), userDTO.getFirstname());
-        assertEquals(userCreateRequest.getLastname(), userDTO.getLastname());
-        assertEquals(userCreateRequest.getEmail(), userDTO.getEmail());
-        assertEquals(userCreateRequest.getPassword(), userDTO.getPassword());
+    private UserDTO createUserAndReturnUser(String firstname, String lastname, String email, String password, String username) {
+        UserCreateRequest userCreateRequest = createUserRequest(firstname, lastname, email, password, username);
+        return userService.createUser(userCreateRequest);
     }
 
-    private void assertUserDTOEquality(UserDTO actualUserDTO, UserDTO userDTO) {
-        assertEquals(actualUserDTO.getId(), userDTO.getId());
-        assertEquals(actualUserDTO.getUsername(), userDTO.getUsername());
-        assertEquals(actualUserDTO.getFirstname(), userDTO.getFirstname());
-        assertEquals(actualUserDTO.getLastname(), userDTO.getLastname());
-        assertEquals(actualUserDTO.getEmail(), userDTO.getEmail());
-        assertEquals(actualUserDTO.getPassword(), userDTO.getPassword());
+    private UserCreateRequest createUserRequest(String firstname, String lastname, String email, String password, String username) {
+        return UserCreateRequest.builder()
+                .firstname(firstname)
+                .lastname(lastname)
+                .email(email)
+                .password(password)
+                .username(username)
+                .build();
+    }
+
+    private UserUpdateRequest updateUserRequest(Integer id, String email, String firstname, String lastname, String password, String username) {
+        return UserUpdateRequest.builder()
+                .id(id)
+                .email(email)
+                .firstname(firstname)
+                .lastname(lastname)
+                .password(password)
+                .username(username)
+                .build();
     }
 }

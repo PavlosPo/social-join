@@ -34,11 +34,11 @@ public class Comment {
     private String content;
 
     @ManyToOne
-    @JoinColumn(name = "POST_ID", referencedColumnName = "ID", nullable = false)
+    @JoinColumn(name = "POST_ID", referencedColumnName = "ID", nullable = false, updatable = false)
     private Post post ;
 
     @ManyToMany(mappedBy = "likedComments")
-    private Set<User> likedByUsers;
+    private List<User> usersWhoLikedThisComment;
 
     @CreationTimestamp
     @Column(name = "CREATED_DATE")

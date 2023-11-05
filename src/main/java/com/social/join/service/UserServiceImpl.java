@@ -1,5 +1,6 @@
 package com.social.join.service;
 
+import com.social.join.controllers.NotFoundException;
 import com.social.join.dtos.UserCreateRequest;
 import com.social.join.dtos.UserDTO;
 import com.social.join.dtos.UserUpdateRequest;
@@ -95,7 +96,6 @@ public class UserServiceImpl implements IUserService {
             foundUser.setUsername(userUpdateRequest.getUsername());
             foundUser.setLastname(userUpdateRequest.getLastname());
             foundUser.setPassword(userUpdateRequest.getPassword());
-            foundUser.setVersion(userUpdateRequest.getVersion());
             foundUser.setEmail(userUpdateRequest.getEmail());
             atomicReference.set(Optional.of(userMapper.userToUserDTO(userRepository.save(foundUser))));
         }, () -> {
@@ -104,6 +104,34 @@ public class UserServiceImpl implements IUserService {
 
         return atomicReference.get();
     }
+
+//    @Override
+//    public Optional<UserDTO> updateUser(int id, UserUpdateRequest userUpdateRequest) {
+//        User userToUpdate = userRepository.findById(id)
+//                .orElseThrow(() -> new NotFoundException("User not found"));
+//
+//        // Check and update fields
+//        if (userUpdateRequest.getFirstname() != null) {
+//            userToUpdate.setFirstname(userUpdateRequest.getFirstname());
+//        }
+//        if (userUpdateRequest.getUsername() != null) {
+//            userToUpdate.setUsername(userUpdateRequest.getUsername());
+//        }
+//        if (userUpdateRequest.getLastname() != null) {
+//            userToUpdate.setLastname(userUpdateRequest.getLastname());
+//        }
+//        if (userUpdateRequest.getPassword() != null) {
+//            userToUpdate.setPassword(userUpdateRequest.getPassword());
+//        }
+//        if (userUpdateRequest.getEmail() != null) {
+//            userToUpdate.setEmail(userUpdateRequest.getEmail());
+//        }
+//
+//        // Save the entity
+//        User updatedUser = userRepository.save(userToUpdate);
+//
+//        return Optional.of(userMapper.userToUserDTO(updatedUser));
+//    }
 
     @Override
     public Boolean deleteUser(int id) {

@@ -1,6 +1,7 @@
 package com.social.join.dtos;
 
 
+import com.social.join.entities.Comment;
 import jakarta.annotation.Nullable;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotBlank;
@@ -8,6 +9,7 @@ import jakarta.validation.constraints.NotNull;
 import lombok.*;
 
 import java.time.LocalDateTime;
+import java.util.List;
 import java.util.Set;
 
 @Getter
@@ -16,9 +18,7 @@ import java.util.Set;
 @NoArgsConstructor
 @AllArgsConstructor
 public class PostDTO {
-    @Id
-    @NotBlank
-    @NotNull
+
     private Integer id;
 
     @NotNull
@@ -26,14 +26,14 @@ public class PostDTO {
     private String content;
 
     @Nullable
-    private Set<UserDTO> likedByUsers;
+    private List<UserDTO> usersWhoLikedThisPost;
 
     @NotNull
     @NotBlank
     private UserDTO userCreated;
 
     @Nullable
-    private Set<CommentDTO> comments;
+    private List<CommentDTO> comments;
 
 //    @Nullable
 //    private Set<HashtagDTO> hashtags;
@@ -43,4 +43,18 @@ public class PostDTO {
 
     @NotNull
     private LocalDateTime updatedDate;
+
+//    public boolean setComment(CommentDTO comment) {
+//        if (comment == null) {
+//            return false;  // Comment is null, not added
+//        }
+//
+//        if (comments.contains(comment)) {
+//            return false;  // Comment already exists, not added
+//        }
+//
+//        this.comments.add(comment);
+//        comment.setPost(this);
+//        return true;  // Comment added
+//    }
 }
