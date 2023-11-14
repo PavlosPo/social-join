@@ -6,6 +6,7 @@ import jakarta.validation.constraints.NotNull;
 import lombok.*;
 
 import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
 
@@ -15,9 +16,7 @@ import java.util.Set;
 @NoArgsConstructor
 @AllArgsConstructor
 public class CommentDTO {
-    @Id
-    @NotNull
-    @NotBlank
+
     private Integer id;
 
     @NotNull
@@ -26,13 +25,14 @@ public class CommentDTO {
     @NotNull
     private PostDTO post;
 
-    private List<HashtagDTO> hashtag;
+//    private List<HashtagDTO> hashtag;
 
     @NotNull
     private UserDTO userCreatedIt;
 
-    private List<UserDTO> usersWhoLikedThisComment;
+    @NotNull
+    private List<UserDTO> usersWhoLikedThisComment = new ArrayList<>();
 
     private LocalDateTime createdDate;
-    private LocalDateTime updateDate;
+    private LocalDateTime updatedDate;
 }

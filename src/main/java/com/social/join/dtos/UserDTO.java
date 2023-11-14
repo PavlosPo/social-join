@@ -9,7 +9,9 @@ import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Size;
 import lombok.*;
 
+import java.util.ArrayList;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Set;
 
 @Getter
@@ -19,7 +21,6 @@ import java.util.Set;
 @AllArgsConstructor
 public class UserDTO {
 
-    @Id
     private Integer id;
 
     @NotNull
@@ -43,7 +44,24 @@ public class UserDTO {
     @Size(min = 6)
     private String password;
 
-    private Set<Post> likedPosts = new HashSet<>();
+    private List<PostDTO> likedPosts = new ArrayList<>();
 
-    private Set<Comment> likedComments = new HashSet<>();
+    private List<CommentDTO> likedComments = new ArrayList<>();
+
+
+    public void addLikedPost(PostDTO testPostToAdd) {
+        Boolean updated = false;
+        // If this userDTo has not yet the post dto in its list
+        if (!this.likedPosts.contains(testPostToAdd)) {
+            this.likedPosts.add(testPostToAdd);
+            updated = true;
+        }
+
+        // If post dto has not yet this userDTO in its list
+        assert testPostToAdd.getUsersWhoLikedThisPost() != null;
+        if (!testPostToAdd.getUsersWhoLikedThisPost().contains(this)){
+            testPostToAdd.getUsersWhoLikedThisPost().add(this);
+        }
+
+    }
 }

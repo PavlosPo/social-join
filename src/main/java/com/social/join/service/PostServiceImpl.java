@@ -59,7 +59,7 @@ public class PostServiceImpl implements IPostService {
             foundPost.setContent(mappedPost.getContent());
             foundPost.setUsersWhoLikedThisPost(mappedPost.getUsersWhoLikedThisPost());
             foundPost.setComments(mappedPost.getComments());
-            foundPost.setUpdatedDate(LocalDateTime.now());
+            foundPost.setUpdateDate(LocalDateTime.now());
             atomicReference.set(Optional.of(postMapper.postToPostDTO(postRepository.save(foundPost))));
         }, () -> {
             atomicReference.set(Optional.empty());

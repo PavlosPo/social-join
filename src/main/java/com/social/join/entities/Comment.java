@@ -7,10 +7,7 @@ import org.hibernate.annotations.GenericGenerator;
 import org.hibernate.annotations.UpdateTimestamp;
 
 import java.time.LocalDateTime;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
-import java.util.UUID;
+import java.util.*;
 
 
 @Builder
@@ -37,8 +34,9 @@ public class Comment {
     @JoinColumn(name = "POST_ID", referencedColumnName = "ID", nullable = false, updatable = false)
     private Post post ;
 
+    @Builder.Default
     @ManyToMany(mappedBy = "likedComments")
-    private List<User> usersWhoLikedThisComment;
+    private List<User> usersWhoLikedThisComment = new ArrayList<>();
 
     @CreationTimestamp
     @Column(name = "CREATED_DATE")
@@ -46,5 +44,5 @@ public class Comment {
 
     @UpdateTimestamp
     @Column(name = "UPDATED_DATE")
-    private LocalDateTime updateDate;
+    private LocalDateTime updatedDate;
 }

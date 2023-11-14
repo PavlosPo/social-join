@@ -56,6 +56,7 @@ public class User {
     private String password;
 
     @Builder.Default
+    @Setter()
     @ManyToMany
     @JoinTable(
             name = "USER_LIKES_POSTS",
@@ -72,4 +73,20 @@ public class User {
             inverseJoinColumns = @JoinColumn(name = "COMMENT_ID")
     )
     private List<Comment> likedComments = new ArrayList<>();
+
+    public boolean addLikedPost(Post likedPost) {
+
+        Boolean updated = false;
+        // If user has not yet add it to his list
+        if (!this.likedPosts.contains(likedPost)) {
+            this.likedPosts.add(likedPost);
+            updated = true;
+        }
+        // If post has not yet added this user
+        if (!likedPost.getUsersWhoLikedThisPost().contains(this)) {
+            likedPost.getUsersWhoLikedThisPost().add(this);
+            updated = true;
+        }
+        return updated;
+    }
 }

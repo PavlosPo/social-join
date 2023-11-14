@@ -4,8 +4,6 @@ import com.social.join.dtos.UserCreateRequest;
 import com.social.join.dtos.UserDTO;
 import com.social.join.dtos.UserUpdateRequest;
 import com.social.join.service.IUserService;
-import jakarta.validation.constraints.NotBlank;
-import jakarta.validation.constraints.NotNull;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
@@ -25,9 +23,8 @@ public class UserControllerImpl implements IUserController{
 
     private final IUserService userService;
 
-
     @GetMapping
-    public Page<UserDTO> getAllUsers(
+    public Page<UserDTO> listUsers(
             @RequestParam(value = "username", required = false) String username,
             @RequestParam(value = "firstname", required = false) String firstname,
             @RequestParam(value = "lastname", required = false) String lastname,

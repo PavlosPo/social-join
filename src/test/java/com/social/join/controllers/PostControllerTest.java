@@ -39,7 +39,7 @@ import static org.junit.jupiter.api.Assertions.fail;
 class PostControllerTest {
 
     @MockBean
-    private  IPostController postController;
+    private IPostController postController;
 
     @Autowired
     private IPostService postService;
@@ -81,7 +81,7 @@ class PostControllerTest {
     @Test
     @Transactional
     public void testGetPostById() {
-        PostDTO postToCheck = postMapper.postToPostDTO(postRepository.getReferenceById(0));
+        PostDTO postToCheck = postMapper.postToPostDTO(postRepository.findById(1).orElse(null));
         assertThat(postToCheck).isNotNull();
 
         ResponseEntity<PostDTO> response = postController.getPostById(1);
@@ -95,7 +95,7 @@ class PostControllerTest {
     @Transactional
     @Rollback
     public void testCreateUser() {
-        PostDTO postToCreate = postMapper.postToPostDTO(postRepository.getReferenceById(0));
+        PostDTO postToCreate = postMapper.postToPostDTO(postRepository.findById(1).orElse(null));
         assertThat(postToCreate).isNotNull();
         postToCreate.setContent("UPDATED_CONTENT");
 
@@ -109,7 +109,7 @@ class PostControllerTest {
     @Transactional
     @Rollback
     public void testUpdatePost() {
-        PostDTO postToUpdate = postMapper.postToPostDTO(postRepository.getReferenceById(0));
+        PostDTO postToUpdate = postMapper.postToPostDTO(postRepository.findById(1).orElse(null));
         assertThat(postToUpdate).isNotNull();
         postToUpdate.setContent("UPDATED_CONTENT");
 

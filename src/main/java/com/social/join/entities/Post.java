@@ -7,6 +7,8 @@ import jakarta.validation.constraints.NotNull;
 import lombok.*;
 import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.UpdateTimestamp;
+import org.springframework.context.annotation.Lazy;
+import org.springframework.data.repository.cdi.Eager;
 
 import java.time.LocalDateTime;
 import java.util.*;
@@ -40,6 +42,7 @@ public class Post {
 
     @Builder.Default
     @ManyToMany(mappedBy = "likedPosts")
+    @Lazy(value = false)
     private List<User> usersWhoLikedThisPost = new ArrayList<>();
 
     @CreationTimestamp
@@ -48,7 +51,7 @@ public class Post {
 
     @UpdateTimestamp
     @Column(name = "UPDATED_DATE")
-    private LocalDateTime updatedDate;
+    private LocalDateTime updateDate;
 
     public boolean setComment(Comment comment) {
         if (comment == null) {
@@ -62,5 +65,17 @@ public class Post {
         this.comments.add(comment);
         comment.setPost(this);
         return true;  // Comment added
+    }
+
+    public void addUserWhoLikedThisPost(User user) {
+        // If Post instance don't have yet the user
+        if (!this.getUsersWhoLikedThisPost().contains(user)) {
+            this.getUsersWhoLikedThisPost().add(user);
+        }
+
+        // If User instance don't have yet this post
+        if (!user.getLikedPosts().contains(this)) {
+            user.getLikedPosts().add(this);
+        }
     }
 }

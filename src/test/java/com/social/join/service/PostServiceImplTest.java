@@ -29,8 +29,6 @@ class PostServiceImplTest {
     @Autowired
     private IPostService postService;
     @Autowired
-    private IUserRepository userRepository;
-    @Autowired
     private IPostRepository postRepository;
     @Autowired
     private IUserMapper userMapper;
@@ -38,52 +36,29 @@ class PostServiceImplTest {
     private IPostMapper postMapper;
 
     private PostDTO testPost;
-    private User testUser;
     private UserDTO testUserDTO;
 
     @BeforeEach
     @Transactional
     void setUp() {
         testPost = postMapper.postToPostDTO(postRepository.getReferenceById(1));
-        testUser = userMapper.userDTOToUser(testPost.getUserCreated());
-        // testUser.setVersion(postRepository.getReferenceById(1).getUserCreated().getVersion());
         testUserDTO = testPost.getUserCreated();
-//        User user = userRepository.findById(1).orElseThrow(() -> new RuntimeException("User not found"));
-//
-//        // Create a new PostDTO and associate it with the fetched User
-//        PostDTO testPost = new PostDTO();
-//        testPost.setUserCreated(userMapper.userToUserDTO(user));
-//        testPost.setContent("Initial Content");
-//
-//        // Save the testPost to the database
-//        testPost = postService.savePost(testPost);
     }
 
     @AfterEach
     void tearDown() {
         testPost = null;
-        testUser = null ;
         testUserDTO = null ;
     }
 
     @Test
     @Transactional
     void createPost() {
-//        // Arrange
-//        String updatedContent = "TEST_CONTENT";
-//        testPost.setId(null);
-//        testPost.setContent(updatedContent);
-//
-//        // Act
-//        PostDTO returnedPost = postService.savePost(testPost);
-//
-//        // Assert
-//        assertPostEquality(returnedPost, testPost);
         // Arrange
         testPost.setId(null);
         testPost.setUserCreated(testUserDTO);
         testPost.setCreatedDate(null);
-        testPost.setUpdatedDate(null);
+        testPost.setUpdateDate(null);
         testPost.setUsersWhoLikedThisPost(null);
         testPost.setComments(null);
         testPost.setContent("UPDATED_CONTENT");

@@ -31,28 +31,6 @@ public class UserServiceImpl implements IUserService {
     private static final int DEFAULT_PAGE = 0;
     private static final int DEFAULT_PAGE_SIZE = 25;
 
-
-//    @Override
-//    public List<UserDTO> getUsersBySearch(String username, String firstname, String lastname) {
-//        List<User> userList = new ArrayList<>();
-//
-//        if (StringUtils.hasText(username)) {
-//            userList.addAll(userRepository.findAllByUsernameLikeIgnoreCase("%" + username + "%", ));
-//        }
-//
-//        if (StringUtils.hasText(firstname)) {
-//            userList.addAll(userRepository.findAllByFirstnameLikeIgnoreCase("%" + firstname + "%", ));
-//        }
-//
-//        if (StringUtils.hasText(lastname)) {
-//            userList.addAll(userRepository.findAllByLastnameLikeIgnoreCase("%" + lastname + "%", ));
-//        }
-//
-//        return userList.stream()
-//                .map(userMapper::userToUserDTO)
-//                .collect(Collectors.toList());
-//    }
-
     @Override
     public Page<UserDTO> getAllUsers(String username, String firstname, String lastname, Integer pageNumber, Integer pageSize) {
         PageRequest pageRequest = buildPageRequest(pageNumber, pageSize);

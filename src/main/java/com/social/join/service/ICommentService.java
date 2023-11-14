@@ -5,6 +5,7 @@ import com.social.join.dtos.PostDTO;
 import com.social.join.dtos.UserDTO;
 import org.springframework.stereotype.Service;
 
+import java.util.List;
 import java.util.Optional;
 
 @Service
@@ -13,11 +14,13 @@ public interface ICommentService {
 
     /**
      * Here we create a new comment in a post
-     * @param userDTO   the user that does the comment
-     * @param postDTO   the post that the comment goes to
-     * @return  the new comment instance as {@link CommentDTO}
+     *
+     * @param userDTO    the user that does the comment
+     * @param postDTO    the post that the comment goes to
+     * @param commentDTO    the comment instance to create
+     * @return the new comment instance as {@link CommentDTO}
      */
-    CommentDTO createComment(UserDTO userDTO, PostDTO postDTO);
+    CommentDTO createComment(UserDTO userDTO, PostDTO postDTO, CommentDTO commentDTO);
 
     /**
      * It returns the {@link CommentDTO} instance of the comment with the corensponding id
@@ -27,12 +30,20 @@ public interface ICommentService {
     Optional<CommentDTO> getCommentById(int id);
 
     /**
-     * It updates the comment via id
-     * @param id    the comment id to update
-     * @param commentDTO    the dto instance that will be updated to
-     * @return  the updated {@link CommentDTO} instance
+     * This returns a list of comments made in the given post id
+     * @param postId THe post id to search for comments
+     * @return  List of CommentsDTO instances
      */
-    CommentDTO updateCommentById(int id, CommentDTO commentDTO);
+    List<CommentDTO> getCommentsByPostId(int postId);
+
+    /**
+     * It updates the comment via id
+     *
+     * @param id         the comment id to update
+     * @param commentDTO the dto instance that will be updated to
+     * @return the updated {@link CommentDTO} instance
+     */
+    Optional<CommentDTO> updateCommentById(int id, CommentDTO commentDTO);
 
     /**
      * It deletes the corresponding comment, searched by id

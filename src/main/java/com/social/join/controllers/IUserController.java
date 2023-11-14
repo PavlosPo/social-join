@@ -10,11 +10,11 @@ import org.springframework.web.bind.annotation.*;
 
 public interface IUserController {
 
-    Page<UserDTO> getAllUsers(@RequestParam(value = "username", required = false) String username,
-                                              @RequestParam(value = "firstname", required = false) String firstname,
-                                              @RequestParam(value = "lastname", required = false) String lastname,
-                                              @RequestParam(value = "pageNumber", required = false) Integer pageNumber,
-                                              @RequestParam(value = "pageSize", required = false) Integer pageSize);
+    Page<UserDTO> listUsers(@RequestParam(value = "username", required = false) String username,
+                            @RequestParam(value = "firstname", required = false) String firstname,
+                            @RequestParam(value = "lastname", required = false) String lastname,
+                            @RequestParam(value = "pageNumber", required = false) Integer pageNumber,
+                            @RequestParam(value = "pageSize", required = false) Integer pageSize);
 
     ResponseEntity<UserDTO> getUserById(@PathVariable Integer userId);
 
