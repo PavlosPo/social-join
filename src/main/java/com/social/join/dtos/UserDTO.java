@@ -8,8 +8,11 @@ import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Size;
 import lombok.*;
+import org.w3c.dom.stylesheets.LinkStyle;
 
+import java.util.ArrayList;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Set;
 
 @Getter
@@ -43,7 +46,9 @@ public class UserDTO {
     @Size(min = 6)
     private String password;
 
-    private Set<Post> likedPosts = new HashSet<>();
+    @Builder.Default
+    private List<Post> likedPosts = new ArrayList<>();
 
-    private Set<Comment> likedComments = new HashSet<>();
+    @Builder.Default
+    private List<Comment> likedComments = new ArrayList<>();
 }

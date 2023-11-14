@@ -134,7 +134,7 @@ class UserServiceImplTest {
         testUser.setFirstname("testFirstname");
         testUser.setLastname("testLastname");
         testUser.setPassword(PASSWORD);
-        testUser.setLikedPosts(Set.of(testPostToAdd));
+//        testUser.setLikedPosts();
         testUser.setEmail(EMAIL);
         return testUser;
     }

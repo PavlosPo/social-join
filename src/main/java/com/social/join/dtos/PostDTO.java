@@ -9,6 +9,7 @@ import jakarta.validation.constraints.NotNull;
 import lombok.*;
 
 import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
 
@@ -26,17 +27,16 @@ public class PostDTO {
     private String content;
 
     @Nullable
-    private List<UserDTO> usersWhoLikedThisPost;
+    @Builder.Default
+    private List<UserDTO> usersWhoLikedThisPost = new ArrayList<>();
 
     @NotNull
     @NotBlank
     private UserDTO userCreated;
 
     @Nullable
-    private List<CommentDTO> comments;
-
-//    @Nullable
-//    private Set<HashtagDTO> hashtags;
+    @Builder.Default
+    private List<CommentDTO> comments = new ArrayList<>();
 
     @NotNull
     private LocalDateTime createdDate;

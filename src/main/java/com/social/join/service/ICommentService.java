@@ -1,8 +1,8 @@
 package com.social.join.service;
 
+import com.social.join.dtos.CommentCreateRequest;
 import com.social.join.dtos.CommentDTO;
-import com.social.join.dtos.PostDTO;
-import com.social.join.dtos.UserDTO;
+import com.social.join.dtos.CommentUpdateRequest;
 import org.springframework.stereotype.Service;
 
 import java.util.Optional;
@@ -13,11 +13,10 @@ public interface ICommentService {
 
     /**
      * Here we create a new comment in a post
-     * @param userDTO   the user that does the comment
-     * @param postDTO   the post that the comment goes to
-     * @return  the new comment instance as {@link CommentDTO}
+     *
+     * @param commentCreateRequest
      */
-    CommentDTO createComment(UserDTO userDTO, PostDTO postDTO);
+    CommentDTO createComment(CommentCreateRequest commentCreateRequest);
 
     /**
      * It returns the {@link CommentDTO} instance of the comment with the corensponding id
@@ -28,11 +27,10 @@ public interface ICommentService {
 
     /**
      * It updates the comment via id
-     * @param id    the comment id to update
-     * @param commentDTO    the dto instance that will be updated to
-     * @return  the updated {@link CommentDTO} instance
+     *
+     * @param commentUpdateRequest@return the updated {@link CommentDTO} instance
      */
-    CommentDTO updateCommentById(int id, CommentDTO commentDTO);
+    CommentDTO updateCommentById(CommentUpdateRequest commentUpdateRequest);
 
     /**
      * It deletes the corresponding comment, searched by id

@@ -1,21 +1,15 @@
 package com.social.join.dtos;
 
-import jakarta.persistence.*;
+import jakarta.persistence.Id;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
-import lombok.*;
+import lombok.Builder;
 
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Set;
 
-@Getter
-@Setter
-@Builder
-@NoArgsConstructor
-@AllArgsConstructor
-public class CommentDTO {
+public class CommentCreateRequest {
     @Id
     @NotNull
     @NotBlank
@@ -27,14 +21,9 @@ public class CommentDTO {
     @NotNull
     private PostDTO post;
 
-    private List<HashtagDTO> hashtag;
+    @Builder.Default
+    private List<HashtagDTO> hashtag = new ArrayList<>();
 
     @NotNull
     private UserDTO userCreatedIt;
-
-    @Builder.Default
-    private List<UserDTO> usersWhoLikedThisComment = new ArrayList<>();
-
-    private LocalDateTime createdDate;
-    private LocalDateTime updateDate;
 }
