@@ -23,15 +23,12 @@ public class PostDTO {
     private Integer id;
 
     @NotNull
-    @NotBlank
     private String content;
 
-    @Nullable
     @Builder.Default
     private List<UserDTO> usersWhoLikedThisPost = new ArrayList<>();
 
     @NotNull
-    @NotBlank
     private UserDTO userCreated;
 
     @Nullable
@@ -44,17 +41,17 @@ public class PostDTO {
     @NotNull
     private LocalDateTime updatedDate;
 
-//    public boolean setComment(CommentDTO comment) {
-//        if (comment == null) {
-//            return false;  // Comment is null, not added
-//        }
-//
-//        if (comments.contains(comment)) {
-//            return false;  // Comment already exists, not added
-//        }
-//
-//        this.comments.add(comment);
-//        comment.setPost(this);
-//        return true;  // Comment added
-//    }
+    public boolean addComment(CommentDTO comment) {
+        if (comment == null) {
+            return false;  // Comment is null, not added
+        }
+
+        if (comments.contains(comment)) {
+            return false;  // Comment already exists, not added
+        }
+
+        this.comments.add(comment);
+        comment.setPost(this);
+        return true;  // Comment added
+    }
 }

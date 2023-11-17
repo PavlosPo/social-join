@@ -22,14 +22,14 @@ public class Post {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(updatable = false, nullable = false)
-    private Integer id = null;
+    private Integer id ;
 
-    @NotNull
-    @NotBlank
+//    @NotNull
+//    @NotBlank
     @Column(name = "CONTENT", length = 512, nullable = false, updatable = true, unique = false)
     private String content;
 
-    @NotNull
+//    @NotNull
     @ManyToOne
     @JoinColumn(name = "USER_ID", referencedColumnName = "ID")
     private User userCreated;
@@ -50,7 +50,7 @@ public class Post {
     @Column(name = "UPDATED_DATE")
     private LocalDateTime updatedDate;
 
-    public boolean setComment(Comment comment) {
+    public boolean addComment(Comment comment) {
         if (comment == null) {
             return false;  // Comment is null, not added
         }

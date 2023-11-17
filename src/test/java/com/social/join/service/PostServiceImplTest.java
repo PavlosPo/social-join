@@ -2,7 +2,6 @@ package com.social.join.service;
 
 import com.social.join.dtos.PostDTO;
 import com.social.join.dtos.UserDTO;
-import com.social.join.entities.Post;
 import com.social.join.entities.User;
 import com.social.join.mappers.IPostMapper;
 import com.social.join.mappers.IUserMapper;
@@ -46,17 +45,8 @@ class PostServiceImplTest {
     void setUp() {
         testPost = postMapper.postToPostDTO(postRepository.getReferenceById(1));
         testUser = userMapper.userDTOToUser(testPost.getUserCreated());
-        // testUser.setVersion(postRepository.getReferenceById(1).getUserCreated().getVersion());
         testUserDTO = testPost.getUserCreated();
-//        User user = userRepository.findById(1).orElseThrow(() -> new RuntimeException("User not found"));
-//
-//        // Create a new PostDTO and associate it with the fetched User
-//        PostDTO testPost = new PostDTO();
-//        testPost.setUserCreated(userMapper.userToUserDTO(user));
-//        testPost.setContent("Initial Content");
-//
-//        // Save the testPost to the database
-//        testPost = postService.savePost(testPost);
+
     }
 
     @AfterEach
@@ -69,16 +59,6 @@ class PostServiceImplTest {
     @Test
     @Transactional
     void createPost() {
-//        // Arrange
-//        String updatedContent = "TEST_CONTENT";
-//        testPost.setId(null);
-//        testPost.setContent(updatedContent);
-//
-//        // Act
-//        PostDTO returnedPost = postService.savePost(testPost);
-//
-//        // Assert
-//        assertPostEquality(returnedPost, testPost);
         // Arrange
         testPost.setId(null);
         testPost.setUserCreated(testUserDTO);
@@ -89,7 +69,7 @@ class PostServiceImplTest {
         testPost.setContent("UPDATED_CONTENT");
 
         // Act
-        PostDTO returnedPost = postService.savePost(testPost);
+        PostDTO returnedPost = postService.createPost(postMapper.postDTOToPostCreateRequest(testPost));
 
         // Assert
         assertPostEquality(returnedPost, testPost);
@@ -126,8 +106,9 @@ class PostServiceImplTest {
         String updatedContent = "UPDATED_CONTENT";
         testPost.setContent(updatedContent);
 
+
         // Act
-        Optional<PostDTO> updatedPostOptional = postService.updatePostById(testPost.getId(), testPost);
+        Optional<PostDTO> updatedPostOptional = postService.updatePost(postMapper.postDTOToPostUpdateRequest(testPost), testPost.getId());
 
         // Assert
         assertThat(updatedPostOptional).isPresent()
@@ -143,7 +124,7 @@ class PostServiceImplTest {
         ));
 
         // Act
-        Optional<PostDTO> updatedPostOptional = postService.updatePostById(testPost.getId(), testPost);
+        Optional<PostDTO> updatedPostOptional = postService.updatePost(postMapper.postDTOToPostUpdateRequest(testPost), testPost.getId());
 
         // Assert
         assertThat(updatedPostOptional).isPresent()

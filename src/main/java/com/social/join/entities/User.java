@@ -25,15 +25,15 @@ public class User {
     @Column(updatable = false, nullable = false)
     private Integer id;
 
-    @NotNull
-    @NotBlank
+//    @NotNull
+//    @NotBlank
     private String firstname;
 
-    @NotBlank
+//    @NotBlank
     private String lastname;
 
-    @NotNull
-    @NotBlank
+//    @NotNull
+//    @NotBlank
     private String username;
 
     @Builder.Default
@@ -45,13 +45,13 @@ public class User {
     )
     private List<User> friends = new ArrayList<>();
 
-    @NotNull
-    @NotBlank
+//    @NotNull
+//    @NotBlank
     @Email(message = "Email Error")
     private String email;
 
-    @NotNull
-    @NotBlank
+//    @NotNull
+//    @NotBlank
     @Size(min = 6)
     private String password;
 

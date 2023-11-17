@@ -16,9 +16,7 @@ import java.util.Set;
 @NoArgsConstructor
 @AllArgsConstructor
 public class CommentDTO {
-    @Id
-    @NotNull
-    @NotBlank
+
     private Integer id;
 
     @NotNull
@@ -27,7 +25,7 @@ public class CommentDTO {
     @NotNull
     private PostDTO post;
 
-    private List<HashtagDTO> hashtag;
+//    private List<HashtagDTO> hashtag;
 
     @NotNull
     private UserDTO userCreatedIt;
