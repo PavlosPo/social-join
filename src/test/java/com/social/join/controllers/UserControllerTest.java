@@ -36,6 +36,9 @@ class UserControllerTest {
     @Autowired
     private IUserService userService;
 
+//    @Autowired
+//    private IUserController userController;
+
     private UserDTO userToHelp;
     private Integer userIdToHelp;
 

@@ -1,9 +1,7 @@
 package com.social.join.dtos;
 
 
-import com.social.join.entities.Comment;
 import jakarta.annotation.Nullable;
-import jakarta.persistence.*;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import lombok.*;
@@ -11,7 +9,6 @@ import lombok.*;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Set;
 
 @Getter
 @Setter
@@ -34,7 +31,7 @@ public class PostDTO {
     private UserDTO userCreated;
 
     @Nullable
-    private List<CommentDTO> comments = new ArrayList<>();
+//    private List<CommentDTO> comments = new ArrayList<>();
 
     @NotNull
     private LocalDateTime createdDate;
@@ -42,17 +39,17 @@ public class PostDTO {
     @NotNull
     private LocalDateTime updateDate;
 
-    public boolean setComment(CommentDTO comment) {
-        if (comment == null) {
-            return false;  // Comment is null, not added
-        }
-
-        if (comments.contains(comment)) {
-            return false;  // Comment already exists, not added
-        }
-
-        this.comments.add(comment);
-        comment.setPost(this);
-        return true;  // Comment added
-    }
+//    public boolean setComment(CommentDTO comment) {
+//        if (comment == null) {
+//            return false;  // Comment is null, not added
+//        }
+//
+//        if (comments.contains(comment)) {
+//            return false;  // Comment already exists, not added
+//        }
+//
+//        this.comments.add(comment);
+//        comment.setPost(this);
+//        return true;  // Comment added
+//    }
 }

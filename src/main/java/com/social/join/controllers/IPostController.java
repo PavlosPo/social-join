@@ -10,22 +10,16 @@ import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
-@RestController
 public interface IPostController {
 
-    @GetMapping("/posts")
     ResponseEntity<List<PostDTO>> getAllPosts();
 
-    @GetMapping("/posts/{id}")
     ResponseEntity<PostDTO> getPostById(@PathVariable Integer id);
 
-    @PostMapping("/posts")
     ResponseEntity<PostDTO> createPost(@RequestBody PostDTO postDTO);
 
-    @PutMapping("/posts/{id}")
     ResponseEntity<PostDTO> updatePost(@PathVariable Integer id, @RequestBody PostDTO postDTO);
 
-    @DeleteMapping("/posts/{id}")
     ResponseEntity<Boolean> deletePost(@PathVariable Integer id);
 
 

@@ -1,7 +1,5 @@
 package com.social.join.bootstrapData;
 
-import com.social.join.entities.Comment;
-import com.social.join.entities.Hashtag;
 import com.social.join.entities.Post;
 import com.social.join.entities.User;
 import org.springframework.stereotype.Component;
@@ -45,32 +43,33 @@ public class DummyDataGenerator {
         return posts;
     }
 
-    public static List<Hashtag> generateHashtags(int numHashtags) {
-        List<Hashtag> hashtags = new ArrayList<>();
-        for (int i = 0; i < numHashtags; i++) {
-            Hashtag hashtag = Hashtag.builder()
-                    .hashtag("hashtag" + i)
-                    .description("Description for hashtag " + i)
-                    .build();
-            hashtags.add(hashtag);
-        }
-        return hashtags;
-    }
 
-    public static List<Comment> generateComments(List<User> users, List<Post> posts, int numComments) {
-        List<Comment> comments = new ArrayList<>();
-        Random random = new Random();
-        for (int i = 0; i < numComments; i++) {
-            User user = users.get(random.nextInt(users.size()));
-            Post post = posts.get(random.nextInt(posts.size()));
-            Comment comment = Comment.builder()
-                    .userCreatedIt(user)
-                    .content("Comment content " + i)
-                    .post(post)
-                    .createdDate(LocalDateTime.now())
-                    .build();
-            comments.add(comment);
-        }
-        return comments;
-    }
+//    public static List<Hashtag> generateHashtags(int numHashtags) {
+//        List<Hashtag> hashtags = new ArrayList<>();
+//        for (int i = 0; i < numHashtags; i++) {
+//            Hashtag hashtag = Hashtag.builder()
+//                    .hashtag("hashtag" + i)
+//                    .description("Description for hashtag " + i)
+//                    .build();
+//            hashtags.add(hashtag);
+//        }
+//        return hashtags;
+//    }
+
+//    public static List<Comment> generateComments(List<User> users, List<Post> posts, int numComments) {
+//        List<Comment> comments = new ArrayList<>();
+//        Random random = new Random();
+//        for (int i = 0; i < numComments; i++) {
+//            User user = users.get(random.nextInt(users.size()));
+//            Post post = posts.get(random.nextInt(posts.size()));
+//            Comment comment = Comment.builder()
+//                    .userCreatedIt(user)
+//                    .content("Comment content " + i)
+//                    .post(post)
+//                    .createdDate(LocalDateTime.now())
+//                    .build();
+//            comments.add(comment);
+//        }
+//        return comments;
+//    }
 }

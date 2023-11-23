@@ -7,9 +7,8 @@ import com.social.join.entities.Post;
 import com.social.join.mappers.ICreateUserRequestMapper;
 import com.social.join.mappers.IPostMapper;
 import com.social.join.mappers.IUpdateUserRequestMapper;
-import com.social.join.mappers.IUserMapper;
-import com.social.join.repositories.IPostRepository;
 
+import com.social.join.repositories.IPostRepository;
 import jakarta.validation.constraints.NotNull;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -18,9 +17,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.test.annotation.Rollback;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.List;
 import java.util.Optional;
-import java.util.Set;
 
 import static org.assertj.core.api.Assertions.assertThat;
 

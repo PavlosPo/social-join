@@ -1,8 +1,5 @@
 package com.social.join.dtos;
 
-import com.social.join.entities.Comment;
-import com.social.join.entities.Post;
-import jakarta.persistence.*;
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
@@ -10,9 +7,7 @@ import jakarta.validation.constraints.Size;
 import lombok.*;
 
 import java.util.ArrayList;
-import java.util.HashSet;
 import java.util.List;
-import java.util.Set;
 
 @Getter
 @Setter
@@ -46,7 +41,7 @@ public class UserDTO {
 
     private List<PostDTO> likedPosts = new ArrayList<>();
 
-    private List<CommentDTO> likedComments = new ArrayList<>();
+//    private List<CommentDTO> likedComments = new ArrayList<>();
 
 
     public void addLikedPost(PostDTO testPostToAdd) {

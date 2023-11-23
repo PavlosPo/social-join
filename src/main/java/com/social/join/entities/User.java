@@ -65,14 +65,14 @@ public class User {
     )
     private List<Post> likedPosts = new ArrayList<>();
 
-    @Builder.Default
-    @ManyToMany
-    @JoinTable(
-            name = "USER_LIKES_COMMENTS",
-            joinColumns = @JoinColumn(name = "USER_ID"),
-            inverseJoinColumns = @JoinColumn(name = "COMMENT_ID")
-    )
-    private List<Comment> likedComments = new ArrayList<>();
+//    @Builder.Default
+//    @ManyToMany
+//    @JoinTable(
+//            name = "USER_LIKES_COMMENTS",
+//            joinColumns = @JoinColumn(name = "USER_ID"),
+//            inverseJoinColumns = @JoinColumn(name = "COMMENT_ID")
+//    )
+//    private List<Comment> likedComments = new ArrayList<>();
 
     public boolean addLikedPost(Post likedPost) {
 

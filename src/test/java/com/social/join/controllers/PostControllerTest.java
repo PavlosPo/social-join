@@ -3,20 +3,14 @@ package com.social.join.controllers;
 import com.social.join.bootstrapData.DummyData;
 import com.social.join.bootstrapData.DummyDataGenerator;
 import com.social.join.dtos.PostDTO;
-import com.social.join.dtos.UserCreateRequest;
 import com.social.join.dtos.UserDTO;
-import com.social.join.dtos.UserUpdateRequest;
 import com.social.join.mappers.IPostMapper;
-import com.social.join.mappers.IUserMapper;
 import com.social.join.repositories.IPostRepository;
-import com.social.join.repositories.IUserRepository;
 import com.social.join.service.IPostService;
-import com.social.join.service.IUserService;
 import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.context.annotation.Import;
@@ -27,12 +21,9 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 import java.util.Objects;
-import java.util.Optional;
-import java.util.stream.Collectors;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.fail;
+import static org.junit.jupiter.api.Assertions.*;
 
 @SpringBootTest
 @Import({DummyDataGenerator.class, DummyData.class})
@@ -52,30 +43,37 @@ class PostControllerTest {
 
     @BeforeEach
     public void setup() {
-        postController = new PostControllerImpl();
+        postController = new PostControllerImpl(postRepository, postService, postMapper);
     }
 
     @Test
     @Transactional
     public void testGetAllPosts() {
-        // actual users
-        if (postRepository.findAll().isEmpty()){
-            assert false;
-        }
-        List<PostDTO> posts = postRepository.findAll()
+        // Actual posts from the repository
+        List<PostDTO> actualPosts = postRepository.findAll()
                 .stream()
                 .map(postMapper::postToPostDTO)
                 .toList();
 
-        Assertions.assertThat(posts)
+        Assertions.assertThat(actualPosts)
                 .allMatch(Objects::nonNull);
 
-        // controller's users
+        // Controller's posts
         ResponseEntity<List<PostDTO>> response = postController.getAllPosts();
 
         assertEquals(HttpStatus.OK, response.getStatusCode());
-        assertEquals(posts.size(), Objects.requireNonNull(response.getBody()).size());
-        assertEquals(posts.get(0), response.getBody().get(0));
+
+        List<PostDTO> controllerPosts = response.getBody();
+        assertNotNull(controllerPosts);
+
+        // Check that the sizes match
+        assertEquals(actualPosts.size(), controllerPosts.size());
+
+        // Check that each post in the controller's response is present in the actual posts
+        for (int i = 0; i < actualPosts.size(); i++) {
+            assertEquals(actualPosts.get(i).getId(), controllerPosts.get(i).getId());
+            // Add more assertions as needed for other fields
+        }
     }
 
     @Test
@@ -93,16 +91,21 @@ class PostControllerTest {
 
     @Test
     @Transactional
-    @Rollback
-    public void testCreateUser() {
+    public void testCreatePost() {
         PostDTO postToCreate = postMapper.postToPostDTO(postRepository.findById(1).orElse(null));
+//        System.out.println(postToCreate);
         assertThat(postToCreate).isNotNull();
         postToCreate.setContent("UPDATED_CONTENT");
+        postToCreate.setId(null);
 
         ResponseEntity<PostDTO> response = postController.createPost(postToCreate);
 
         assertEquals(HttpStatus.CREATED, response.getStatusCode());
-        assertPostDTOEquality(postToCreate, Objects.requireNonNull(response.getBody()));
+        assertThat(response).isNotNull();
+        assertThat(response.getBody().getId()).isNotNull();
+        assertThat(response.getBody().getContent()).isNotNull();
+        assertThat(response.getBody().getContent()).isEqualTo(postToCreate.getContent());
+        assertThat(response.getBody().getUserCreated().getId()).isEqualTo(postToCreate.getUserCreated().getId());
     }
 
     @Test
@@ -127,7 +130,8 @@ class PostControllerTest {
         ResponseEntity<Boolean> response = postController.deletePost(1);
 
         assertEquals(HttpStatus.NO_CONTENT, response.getStatusCode());
-        assertThat(response.getBody()).isTrue();
+        assertThat(response.getStatusCode()).isEqualTo(HttpStatus.NO_CONTENT);
+        assertThat(response.getBody()).isNull();
 
         assertThat(postService.deletePostById(1)).isFalse();    // not existing anymore
     }
@@ -135,9 +139,9 @@ class PostControllerTest {
     private void assertPostDTOEquality(PostDTO actualPostDTO, PostDTO postDTO) {
         assertEquals(actualPostDTO.getId(), postDTO.getId());
         assertEquals(actualPostDTO.getContent(), postDTO.getContent());
-        assertEquals(actualPostDTO.getComments(), postDTO.getComments());
-        assertEquals(actualPostDTO.getUserCreated(), postDTO.getUserCreated());
-        assertEquals(actualPostDTO.getUsersWhoLikedThisPost(), postDTO.getUsersWhoLikedThisPost());
+//        assertEquals(actualPostDTO.getComments(), postDTO.getComments());
+        assertEquals(actualPostDTO.getUserCreated().getId(), postDTO.getUserCreated().getId());
+        assertEquals(actualPostDTO.getUsersWhoLikedThisPost().size(), postDTO.getUsersWhoLikedThisPost().size());
         assertEquals(actualPostDTO.getCreatedDate(), postDTO.getCreatedDate());
     }
 

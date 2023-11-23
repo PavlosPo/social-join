@@ -2,12 +2,9 @@ package com.social.join.service;
 
 import com.social.join.dtos.PostDTO;
 import com.social.join.dtos.UserDTO;
-import com.social.join.entities.Post;
-import com.social.join.entities.User;
 import com.social.join.mappers.IPostMapper;
 import com.social.join.mappers.IUserMapper;
 import com.social.join.repositories.IPostRepository;
-import com.social.join.repositories.IUserRepository;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -60,7 +57,7 @@ class PostServiceImplTest {
         testPost.setCreatedDate(null);
         testPost.setUpdateDate(null);
         testPost.setUsersWhoLikedThisPost(null);
-        testPost.setComments(null);
+//        testPost.setComments(null);
         testPost.setContent("UPDATED_CONTENT");
 
         // Act
@@ -129,7 +126,7 @@ class PostServiceImplTest {
     private void assertPostEquality(PostDTO actualPost, PostDTO expectedPost){
         assertThat(actualPost.getId()).isNotNull();
         assertThat(actualPost.getContent()).isEqualTo(expectedPost.getContent());
-        assertThat(actualPost.getComments()).isEqualTo(expectedPost.getComments());
+//        assertThat(actualPost.getComments()).isEqualTo(expectedPost.getComments());
         assertThat(actualPost.getUserCreated().getId()).isEqualTo(expectedPost.getUserCreated().getId());
 
         // this is to count the num of other's user's ids

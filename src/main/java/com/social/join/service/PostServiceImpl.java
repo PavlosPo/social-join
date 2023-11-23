@@ -27,6 +27,7 @@ public class PostServiceImpl implements IPostService {
 
     @Override
     public PostDTO savePost(PostDTO postDTO) {
+        System.out.println("I am At service: "+ postDTO);
         return postMapper.postToPostDTO(postRepository.save(postMapper.postDTOToPost(postDTO)));
     }
 
@@ -58,7 +59,7 @@ public class PostServiceImpl implements IPostService {
             Post mappedPost = postMapper.postDTOToPost(postDTO);
             foundPost.setContent(mappedPost.getContent());
             foundPost.setUsersWhoLikedThisPost(mappedPost.getUsersWhoLikedThisPost());
-            foundPost.setComments(mappedPost.getComments());
+//            foundPost.setComments(mappedPost.getComments());
             foundPost.setUpdateDate(LocalDateTime.now());
             atomicReference.set(Optional.of(postMapper.postToPostDTO(postRepository.save(foundPost))));
         }, () -> {

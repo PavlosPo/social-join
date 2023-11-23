@@ -24,21 +24,18 @@ public class Post {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(updatable = false, nullable = false)
-    private Integer id = null;
+    private Integer id;
 
-    @NotNull
-    @NotBlank
     @Column(name = "CONTENT", length = 512, nullable = false, updatable = true, unique = false)
     private String content;
 
-    @NotNull
     @ManyToOne
     @JoinColumn(name = "USER_ID", referencedColumnName = "ID")
     private User userCreated;
 
-    @Builder.Default    // Lombok will Initialize empty HashSet()
-    @OneToMany(mappedBy = "post")
-    private List<Comment> comments = new ArrayList<>();
+//    @Builder.Default    // Lombok will Initialize empty HashSet()
+//    @OneToMany(mappedBy = "post")
+//    private List<Comment> comments = new ArrayList<>();
 
     @Builder.Default
     @ManyToMany(mappedBy = "likedPosts")
@@ -53,19 +50,19 @@ public class Post {
     @Column(name = "UPDATED_DATE")
     private LocalDateTime updateDate;
 
-    public boolean setComment(Comment comment) {
-        if (comment == null) {
-            return false;  // Comment is null, not added
-        }
-
-        if (comments.contains(comment)) {
-            return false;  // Comment already exists, not added
-        }
-
-        this.comments.add(comment);
-        comment.setPost(this);
-        return true;  // Comment added
-    }
+//    public boolean setComment(Comment comment) {
+//        if (comment == null) {
+//            return false;  // Comment is null, not added
+//        }
+//
+//        if (comments.contains(comment)) {
+//            return false;  // Comment already exists, not added
+//        }
+//
+//        this.comments.add(comment);
+//        comment.setPost(this);
+//        return true;  // Comment added
+//    }
 
     public void addUserWhoLikedThisPost(User user) {
         // If Post instance don't have yet the user
