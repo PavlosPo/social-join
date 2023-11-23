@@ -5,7 +5,7 @@ import com.social.join.dtos.UserDTO;
 import com.social.join.dtos.UserUpdateRequest;
 import org.mapstruct.Mapper;
 
-@Mapper
+@Mapper(componentModel = "spring")
 public interface IUpdateUserRequestMapper {
 
     UserDTO userUpdateRequestToUserDTO(UserUpdateRequest userUpdateRequest);

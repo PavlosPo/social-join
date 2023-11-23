@@ -65,7 +65,6 @@ class PostServiceImplTest {
         testPost.setCreatedDate(null);
         testPost.setUpdatedDate(null);
         testPost.setUsersWhoLikedThisPost(null);
-        testPost.setComments(null);
         testPost.setContent("UPDATED_CONTENT");
 
         // Act

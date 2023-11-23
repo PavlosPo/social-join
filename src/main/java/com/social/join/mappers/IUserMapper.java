@@ -5,7 +5,7 @@ import com.social.join.dtos.UserDTO;
 import com.social.join.entities.User;
 import org.mapstruct.Mapper;
 
-@Mapper
+@Mapper(componentModel = "spring")
 public interface IUserMapper {
 
     User userDTOToUser(UserDTO userDTO);

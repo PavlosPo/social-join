@@ -4,7 +4,7 @@ import com.social.join.dtos.HashtagDTO;
 import com.social.join.entities.Hashtag;
 import org.mapstruct.Mapper;
 
-@Mapper
+@Mapper(componentModel = "spring")
 public interface IHashtagMapper {
 
     Hashtag hashtagDTOToHashtag(HashtagDTO hashtagDTO);

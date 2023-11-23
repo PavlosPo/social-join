@@ -56,20 +56,20 @@ public class User {
     private String password;
 
     @Builder.Default
-    @ManyToMany
+    @ManyToMany(fetch = FetchType.LAZY, cascade = { CascadeType.ALL}, targetEntity = Post.class)
     @JoinTable(
             name = "USER_LIKES_POSTS",
             joinColumns = @JoinColumn(name = "USER_ID"),
             inverseJoinColumns = @JoinColumn(name = "POST_ID")
     )
-    private List<Post> likedPosts = new ArrayList<>();
+    private Set<Post> likedPosts = new HashSet<>();
 
     @Builder.Default
-    @ManyToMany
+    @ManyToMany(fetch = FetchType.LAZY, cascade = { CascadeType.ALL}, targetEntity = Comment.class)
     @JoinTable(
             name = "USER_LIKES_COMMENTS",
             joinColumns = @JoinColumn(name = "USER_ID"),
             inverseJoinColumns = @JoinColumn(name = "COMMENT_ID")
     )
-    private List<Comment> likedComments = new ArrayList<>();
+    private Set<Comment> likedComments = new HashSet<>();
 }
