@@ -23,15 +23,9 @@ public class PostDTO {
     @NotBlank
     private String content;
 
-    @Nullable
     private List<UserDTO> usersWhoLikedThisPost = new ArrayList<>();
 
-    @NotNull
-    @NotBlank
     private UserDTO userCreated;
-
-    @Nullable
-//    private List<CommentDTO> comments = new ArrayList<>();
 
     @NotNull
     private LocalDateTime createdDate;

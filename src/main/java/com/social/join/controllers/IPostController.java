@@ -1,10 +1,6 @@
 package com.social.join.controllers;
 
-import com.social.join.dtos.PostDTO;
-import com.social.join.dtos.UserCreateRequest;
-import com.social.join.dtos.UserDTO;
-import com.social.join.dtos.UserUpdateRequest;
-import com.social.join.entities.Post;
+import com.social.join.dtos.*;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -16,9 +12,9 @@ public interface IPostController {
 
     ResponseEntity<PostDTO> getPostById(@PathVariable Integer id);
 
-    ResponseEntity<PostDTO> createPost(@RequestBody PostDTO postDTO);
+    ResponseEntity<PostDTO> createPost(@RequestBody PostCreateRequest postCreateRequest);
 
-    ResponseEntity<PostDTO> updatePost(@PathVariable Integer id, @RequestBody PostDTO postDTO);
+    ResponseEntity<PostDTO> updatePost(@PathVariable Integer id, @RequestBody PostUpdateRequest postDTO);
 
     ResponseEntity<Boolean> deletePost(@PathVariable Integer id);
 

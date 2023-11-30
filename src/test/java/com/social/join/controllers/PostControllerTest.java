@@ -98,7 +98,7 @@ class PostControllerTest {
         postToCreate.setContent("UPDATED_CONTENT");
         postToCreate.setId(null);
 
-        ResponseEntity<PostDTO> response = postController.createPost(postToCreate);
+        ResponseEntity<PostDTO> response = postController.createPost(postMapper.postDTOToPostCreateRequest(postToCreate));
 
         assertEquals(HttpStatus.CREATED, response.getStatusCode());
         assertThat(response).isNotNull();
@@ -116,7 +116,8 @@ class PostControllerTest {
         assertThat(postToUpdate).isNotNull();
         postToUpdate.setContent("UPDATED_CONTENT");
 
-        ResponseEntity<PostDTO> response = postController.updatePost(postToUpdate.getId(), postToUpdate);
+
+        ResponseEntity<PostDTO> response = postController.updatePost(postToUpdate.getId(), postMapper.postDTOToPostUpdateRequest(postToUpdate));
 
         assertEquals(HttpStatus.OK, response.getStatusCode());
         assertPostDTOEquality(postToUpdate, Objects.requireNonNull(response.getBody()));

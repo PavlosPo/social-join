@@ -1,6 +1,8 @@
 package com.social.join.service;
 
+import com.social.join.dtos.PostCreateRequest;
 import com.social.join.dtos.PostDTO;
+import com.social.join.dtos.PostUpdateRequest;
 import com.social.join.dtos.UserDTO;
 import com.social.join.entities.Post;
 import com.social.join.mappers.IPostMapper;
@@ -26,9 +28,9 @@ public class PostServiceImpl implements IPostService {
     private final IUserMapper userMapper;
 
     @Override
-    public PostDTO savePost(PostDTO postDTO) {
-        System.out.println("I am At service: "+ postDTO);
-        return postMapper.postToPostDTO(postRepository.save(postMapper.postDTOToPost(postDTO)));
+    public PostDTO createPost(PostCreateRequest postCreateRequest) {
+        System.out.println("I am At service: "+ postCreateRequest);
+        return postMapper.postToPostDTO(postRepository.save(postMapper.postCreateRequestToPost(postCreateRequest)));
     }
 
     @Override
@@ -52,11 +54,11 @@ public class PostServiceImpl implements IPostService {
     }
 
     @Override
-    public Optional<PostDTO> updatePostById(int id, PostDTO postDTO) {
+    public Optional<PostDTO> updatePostById(int id, PostUpdateRequest postUpdateRequest) {
         AtomicReference<Optional<PostDTO>> atomicReference = new AtomicReference<>();
 
         postRepository.findById(id).ifPresentOrElse(foundPost -> {
-            Post mappedPost = postMapper.postDTOToPost(postDTO);
+            Post mappedPost = postMapper.postUpdateRequestToPost(postUpdateRequest);
             foundPost.setContent(mappedPost.getContent());
             foundPost.setUsersWhoLikedThisPost(mappedPost.getUsersWhoLikedThisPost());
 //            foundPost.setComments(mappedPost.getComments());

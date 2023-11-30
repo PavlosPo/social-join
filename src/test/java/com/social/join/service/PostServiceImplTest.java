@@ -61,7 +61,7 @@ class PostServiceImplTest {
         testPost.setContent("UPDATED_CONTENT");
 
         // Act
-        PostDTO returnedPost = postService.savePost(testPost);
+        PostDTO returnedPost = postService.createPost(postMapper.postDTOToPostCreateRequest(testPost));
 
         // Assert
         assertPostEquality(returnedPost, testPost);
@@ -99,7 +99,7 @@ class PostServiceImplTest {
         testPost.setContent(updatedContent);
 
         // Act
-        Optional<PostDTO> updatedPostOptional = postService.updatePostById(testPost.getId(), testPost);
+        Optional<PostDTO> updatedPostOptional = postService.updatePostById(testPost.getId(), postMapper.postDTOToPostUpdateRequest(testPost));
 
         // Assert
         assertThat(updatedPostOptional).isPresent()
@@ -115,7 +115,7 @@ class PostServiceImplTest {
         ));
 
         // Act
-        Optional<PostDTO> updatedPostOptional = postService.updatePostById(testPost.getId(), testPost);
+        Optional<PostDTO> updatedPostOptional = postService.updatePostById(testPost.getId(), postMapper.postDTOToPostUpdateRequest(testPost));
 
         // Assert
         assertThat(updatedPostOptional).isPresent()

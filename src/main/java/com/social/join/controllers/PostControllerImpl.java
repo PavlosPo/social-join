@@ -1,23 +1,23 @@
 package com.social.join.controllers;
 
+import com.fasterxml.jackson.annotation.JsonFormat;
+import com.social.join.dtos.PostCreateRequest;
 import com.social.join.dtos.PostDTO;
+import com.social.join.dtos.PostUpdateRequest;
 import com.social.join.mappers.IPostMapper;
 import com.social.join.repositories.IPostRepository;
 import com.social.join.service.IPostService;
+import jdk.jfr.ContentType;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.ArrayList;
-import java.util.Collection;
 import java.util.List;
 import java.util.Optional;
-import java.util.stream.Collectors;
 
 @RestController
 @RequiredArgsConstructor
@@ -47,9 +47,10 @@ public class PostControllerImpl implements IPostController{
     }
 
     @Override
-    @PostMapping
-    public ResponseEntity<PostDTO> createPost(PostDTO postDTO) {
-        PostDTO savedPost = postService.savePost(postDTO);
+    @PostMapping()
+    public ResponseEntity<PostDTO> createPost(@RequestBody PostCreateRequest postCreateRequest) {
+
+        PostDTO savedPost = postService.createPost(postCreateRequest);
         HttpHeaders headers = new HttpHeaders();
         headers.add("Location", "/posts/" + savedPost.getId());
         return ResponseEntity.status(HttpStatus.CREATED).headers(headers).body(savedPost);
@@ -58,7 +59,7 @@ public class PostControllerImpl implements IPostController{
     @Override
     @PatchMapping("/{post_id}")
     public ResponseEntity<PostDTO> updatePost(@PathVariable("post_id") Integer id,
-                                              @Validated @RequestBody PostDTO postDTO) {
+                                              @Validated @RequestBody PostUpdateRequest postDTO) {
         if (postDTO.getId() == null) {
             throw new NotFoundException("The Post id does not exists, for post: " + postDTO);
         }

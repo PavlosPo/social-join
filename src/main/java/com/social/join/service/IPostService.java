@@ -1,6 +1,8 @@
 package com.social.join.service;
 
+import com.social.join.dtos.PostCreateRequest;
 import com.social.join.dtos.PostDTO;
+import com.social.join.dtos.PostUpdateRequest;
 import com.social.join.dtos.UserDTO;
 import com.social.join.service.exceptions.PostNotFoundException;
 import org.springframework.stereotype.Service;
@@ -14,10 +16,9 @@ public interface IPostService {
     /**
      * Creates a post made by a user
      *
-     * @param postDTO the {@link PostDTO} instance to create the Post
-     * @return the new {@link PostDTO} instance with the given id
+     * @param postCreateRequest@return the new {@link PostDTO} instance with the given id
      */
-    PostDTO savePost(PostDTO postDTO);
+    PostDTO createPost(PostCreateRequest postCreateRequest);
 
     /**
      * Gets Posts made by specific User's id {@link  com.social.join.entities.User}
@@ -45,11 +46,11 @@ public interface IPostService {
      * Updates the {@link com.social.join.entities.Post} in the database,
      * given a new {@link PostDTO} with the Post's id
      *
-     * @param id      the {@link com.social.join.entities.Post} id
-     * @param postDTO a {@link PostDTO} instance to update the Post with
+     * @param id                the {@link com.social.join.entities.Post} id
+     * @param postUpdateRequest a {@link PostDTO} instance to update the Post with
      * @return the  {@link Optional} of {@link PostDTO} instance that we want to be updated to
      */
-    Optional<PostDTO> updatePostById(int id, PostDTO postDTO);
+    Optional<PostDTO> updatePostById(int id, PostUpdateRequest postUpdateRequest);
 
     /**
      * Gets the Users that liked the Post
