@@ -25,15 +25,15 @@ public class User {
     @Column(updatable = false, nullable = false)
     private Integer id;
 
-    @NotNull
-    @NotBlank
+//    @NotNull
+//    @NotBlank
     private String firstname;
 
-    @NotBlank
+//    @NotBlank
     private String lastname;
 
-    @NotNull
-    @NotBlank
+//    @NotNull
+//    @NotBlank
     private String username;
 
     @Builder.Default
@@ -45,14 +45,14 @@ public class User {
     )
     private List<User> friends = new ArrayList<>();
 
-    @NotNull
-    @NotBlank
-    @Email(message = "Email Error")
+//    @NotNull
+//    @NotBlank
+//    @Email(message = "Email Error")
     private String email;
 
-    @NotNull
-    @NotBlank
-    @Size(min = 6)
+//    @NotNull
+//    @NotBlank
+//    @Size(min = 6)
     private String password;
 
     @Builder.Default
@@ -65,14 +65,11 @@ public class User {
     )
     private List<Post> likedPosts = new ArrayList<>();
 
-//    @Builder.Default
-//    @ManyToMany
-//    @JoinTable(
-//            name = "USER_LIKES_COMMENTS",
-//            joinColumns = @JoinColumn(name = "USER_ID"),
-//            inverseJoinColumns = @JoinColumn(name = "COMMENT_ID")
-//    )
-//    private List<Comment> likedComments = new ArrayList<>();
+//    private String token;
+
+    @Column(nullable = true)
+    @Size(max = 100)
+    private String login;
 
     public boolean addLikedPost(Post likedPost) {
 
@@ -89,4 +86,6 @@ public class User {
         }
         return updated;
     }
+
+
 }

@@ -39,8 +39,9 @@ public class UserDTO {
 
     private List<PostDTO> likedPosts = new ArrayList<>();
 
-//    private List<CommentDTO> likedComments = new ArrayList<>();
+    private String login;
 
+    private String token;
 
     public void addLikedPost(PostDTO testPostToAdd) {
         Boolean updated = false;

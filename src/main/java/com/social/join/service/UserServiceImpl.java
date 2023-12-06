@@ -1,25 +1,24 @@
 package com.social.join.service;
 
-import com.social.join.controllers.NotFoundException;
-import com.social.join.dtos.UserCreateRequest;
-import com.social.join.dtos.UserDTO;
-import com.social.join.dtos.UserUpdateRequest;
+import com.social.join.dtos.*;
 import com.social.join.entities.User;
+import com.social.join.exceptions.AppException;
 import com.social.join.mappers.IUserMapper;
 import com.social.join.repositories.IUserRepository;
+import jdk.swing.interop.SwingInterOpUtils;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Primary;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort;
+import org.springframework.http.HttpStatus;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.util.StringUtils;
 
-import java.util.ArrayList;
-import java.util.List;
+import java.nio.CharBuffer;
 import java.util.Optional;
 import java.util.concurrent.atomic.AtomicReference;
-import java.util.stream.Collectors;
 
 @Service
 @Primary
@@ -27,10 +26,47 @@ import java.util.stream.Collectors;
 public class UserServiceImpl implements IUserService {
     private final IUserRepository userRepository;
     private final IUserMapper userMapper;
+    private final PasswordEncoder passwordEncoder;
+
 
     private static final int DEFAULT_PAGE = 0;
     private static final int DEFAULT_PAGE_SIZE = 25;
 
+    // LOGIN STUFF
+    public UserDTO login(CredentialsDTO credentialsDTO) {
+        User user = userRepository.findByLogin(credentialsDTO.login())
+                .orElseThrow(() -> new AppException("Unknown user", HttpStatus.NOT_FOUND));
+
+        if (passwordEncoder.matches(CharBuffer.wrap(credentialsDTO.password()), user.getPassword())) {
+            return userMapper.userToUserDTO(user);
+        }
+        throw new AppException("Invalid password", HttpStatus.BAD_REQUEST);
+    }
+
+    public UserDTO register(SignUpDTO userDto) {
+        Optional<User> optionalUser = userRepository.findByLogin(userDto.login());
+
+        if (optionalUser.isPresent()) {
+            throw new AppException("Login already exists", HttpStatus.BAD_REQUEST);
+        }
+
+
+        User user = userMapper.signUpToUser(userDto);
+        user.setPassword(passwordEncoder.encode(CharBuffer.wrap(userDto.password())));
+
+        User savedUser = userRepository.save(user);
+
+        return userMapper.userToUserDTO(savedUser);
+    }
+
+    public UserDTO findByLogin(String login) {
+        User user = userRepository.findByLogin(login)
+                .orElseThrow(() -> new AppException("Unknown user", HttpStatus.NOT_FOUND));
+        return userMapper.userToUserDTO(user);
+    }
+
+
+    // API CALLS
     @Override
     public Page<UserDTO> getAllUsers(String username, String firstname, String lastname, Integer pageNumber, Integer pageSize) {
         PageRequest pageRequest = buildPageRequest(pageNumber, pageSize);
@@ -83,34 +119,6 @@ public class UserServiceImpl implements IUserService {
         return atomicReference.get();
     }
 
-//    @Override
-//    public Optional<UserDTO> updateUser(int id, UserUpdateRequest userUpdateRequest) {
-//        User userToUpdate = userRepository.findById(id)
-//                .orElseThrow(() -> new NotFoundException("User not found"));
-//
-//        // Check and update fields
-//        if (userUpdateRequest.getFirstname() != null) {
-//            userToUpdate.setFirstname(userUpdateRequest.getFirstname());
-//        }
-//        if (userUpdateRequest.getUsername() != null) {
-//            userToUpdate.setUsername(userUpdateRequest.getUsername());
-//        }
-//        if (userUpdateRequest.getLastname() != null) {
-//            userToUpdate.setLastname(userUpdateRequest.getLastname());
-//        }
-//        if (userUpdateRequest.getPassword() != null) {
-//            userToUpdate.setPassword(userUpdateRequest.getPassword());
-//        }
-//        if (userUpdateRequest.getEmail() != null) {
-//            userToUpdate.setEmail(userUpdateRequest.getEmail());
-//        }
-//
-//        // Save the entity
-//        User updatedUser = userRepository.save(userToUpdate);
-//
-//        return Optional.of(userMapper.userToUserDTO(updatedUser));
-//    }
-
     @Override
     public Boolean deleteUser(int id) {
         if (userRepository.existsById(id)) {
@@ -146,6 +154,7 @@ public class UserServiceImpl implements IUserService {
         return PageRequest.of(queryPageNumber, queryPageSize, sort);
     }
 
+    // PRIVATE METHODS
     private Page<User> listUsersByUsername(String username, PageRequest pageRequest){
         return userRepository.findAllByFirstnameLikeIgnoreCase("%" + username + "%", pageRequest);
     }
@@ -171,6 +180,7 @@ public class UserServiceImpl implements IUserService {
                 "%" + lastname + "%",
                 pageRequest);
     }
+
 
 
 }
