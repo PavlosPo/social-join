@@ -55,21 +55,16 @@ public class User {
 //    @Size(min = 6)
     private String password;
 
+    private String token;
+
     @Builder.Default
-    @Setter()
-    @ManyToMany
+    @ManyToMany(fetch = FetchType.EAGER)
     @JoinTable(
             name = "USER_LIKES_POSTS",
             joinColumns = @JoinColumn(name = "USER_ID"),
             inverseJoinColumns = @JoinColumn(name = "POST_ID")
     )
     private List<Post> likedPosts = new ArrayList<>();
-
-//    private String token;
-
-    @Column(nullable = true)
-    @Size(max = 100)
-    private String login;
 
     public boolean addLikedPost(Post likedPost) {
 

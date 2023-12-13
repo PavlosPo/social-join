@@ -7,6 +7,7 @@ import com.social.join.dtos.PostUpdateRequest;
 import com.social.join.mappers.IPostMapper;
 import com.social.join.repositories.IPostRepository;
 import com.social.join.service.IPostService;
+import jakarta.validation.Valid;
 import jdk.jfr.ContentType;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;

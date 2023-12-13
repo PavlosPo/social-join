@@ -17,27 +17,27 @@ public class UserUpdateRequest {
 
     private Integer id;
 
-    @NotNull
-    @NotBlank
+//    @NotNull
+//    @NotBlank
     private String firstname;
 
-    @NotBlank
+//    @NotBlank
     private String lastname;
 
-    @NotNull
-    @NotBlank
+//    @NotNull
+//    @NotBlank
     private String username;
 
     @Version
     private Integer version;
 
-    @NotNull
-    @NotBlank
+//    @NotNull
+//    @NotBlank
     @Email(message = "Email Error")
     private String email;
 
-    @NotNull
-    @NotBlank
+//    @NotNull
+//    @NotBlank
     @Size(min = 6)
     private String password;
 }

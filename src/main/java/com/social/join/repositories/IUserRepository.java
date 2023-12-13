@@ -13,10 +13,9 @@ import java.util.Optional;
 public interface IUserRepository extends JpaRepository<User, Integer> {
 
     Page<User> findAllByFirstnameLikeIgnoreCase(String firstname, Pageable pageable);
-    Page<User> findAllByUsernameLikeIgnoreCase(String username, Pageable pageable);
     Page<User> findAllByLastnameLikeIgnoreCase(String lastname, Pageable pageable);
 
     Page<User> findAllByUsernameLikeIgnoreCaseAndAndFirstnameLikeIgnoreCase(String username, String firstname, Pageable pageable);
 
-    Optional<User> findByLogin(String login);
+    Optional<User> findByUsername(String username);
 }

@@ -38,7 +38,7 @@ public class UserAuthenticationProvider {
 
         Algorithm algorithm = Algorithm.HMAC256(secretKey);
         return JWT.create()
-                .withSubject(user.getLogin())
+                .withSubject(user.getUsername())
                 .withIssuedAt(now)
                 .withExpiresAt(validity)
                 .withClaim("firstname", user.getFirstname())
@@ -55,23 +55,12 @@ public class UserAuthenticationProvider {
         DecodedJWT decoded = verifier.verify(token);
 
         UserDTO user = UserDTO.builder()
-                .login(decoded.getIssuer())
+                .id(decoded.getClaim("id").asInt())
+                .username(decoded.getClaim("username").asString())
                 .firstname(decoded.getClaim("firstname").asString())
                 .lastname(decoded.getClaim("lastname").asString())
+                .email(decoded.getClaim("email").asString())
                 .build();
-
-        return new UsernamePasswordAuthenticationToken(user, null, Collections.emptyList());
-    }
-
-    public Authentication validateTokenStrongly(String token) {
-        Algorithm algorithm = Algorithm.HMAC256(secretKey);
-
-        JWTVerifier verifier = JWT.require(algorithm)
-                .build();
-
-        DecodedJWT decoded = verifier.verify(token);
-
-        UserDTO user = userService.findByLogin(decoded.getSubject());
 
         return new UsernamePasswordAuthenticationToken(user, null, Collections.emptyList());
     }

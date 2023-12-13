@@ -3,13 +3,16 @@ package com.social.join.controllers;
 import com.social.join.dtos.UserCreateRequest;
 import com.social.join.dtos.UserDTO;
 import com.social.join.dtos.UserUpdateRequest;
+import com.social.join.exceptions.AppException;
 import com.social.join.service.IUserService;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
@@ -55,15 +58,14 @@ public class UserControllerImpl implements IUserController{
     @PatchMapping("/{userId}")
     public ResponseEntity<UserDTO> updateUser(
             @PathVariable("userId") Integer id,
-            @Validated @RequestBody UserUpdateRequest userUpdateRequest) {
+            @RequestBody UserUpdateRequest userUpdateRequest) {
 
         if (userUpdateRequest.getId() == null){
-            throw new NotFoundException("The user id to update does not exist");
+            throw new AppException("The user id to update does not exist", HttpStatus.BAD_REQUEST);
         }
-
         Optional<UserDTO> updatedUser = userService.updateUser(id, userUpdateRequest);
         if (updatedUser.isEmpty()) {
-            throw new NotFoundException("The user to update does not exist");
+            throw new AppException("The user to update does not exist", HttpStatus.NOT_FOUND);
         }
 
         return ResponseEntity.status(HttpStatus.OK).body(updatedUser.get());
@@ -73,7 +75,7 @@ public class UserControllerImpl implements IUserController{
     @DeleteMapping("/{userId}")
     public ResponseEntity<Boolean> deleteUser(@PathVariable("userId") Integer id) {
         if (!userService.deleteUser(id)) {
-            throw new NotFoundException("The user id to delete does not exists");
+            throw new AppException("The user id to delete does not exists", HttpStatus.NOT_FOUND);
         }
 
         return ResponseEntity.status(HttpStatus.NO_CONTENT).build();

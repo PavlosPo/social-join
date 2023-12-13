@@ -1,11 +1,11 @@
 package com.social.join.service;
 
+import com.social.join.config.PasswordConfig;
 import com.social.join.dtos.*;
 import com.social.join.entities.User;
 import com.social.join.exceptions.AppException;
 import com.social.join.mappers.IUserMapper;
 import com.social.join.repositories.IUserRepository;
-import jdk.swing.interop.SwingInterOpUtils;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Primary;
 import org.springframework.data.domain.Page;
@@ -34,7 +34,8 @@ public class UserServiceImpl implements IUserService {
 
     // LOGIN STUFF
     public UserDTO login(CredentialsDTO credentialsDTO) {
-        User user = userRepository.findByLogin(credentialsDTO.login())
+        System.out.println(credentialsDTO.toString());
+        User user = userRepository.findByUsername(credentialsDTO.username())
                 .orElseThrow(() -> new AppException("Unknown user", HttpStatus.NOT_FOUND));
 
         if (passwordEncoder.matches(CharBuffer.wrap(credentialsDTO.password()), user.getPassword())) {
@@ -44,7 +45,7 @@ public class UserServiceImpl implements IUserService {
     }
 
     public UserDTO register(SignUpDTO userDto) {
-        Optional<User> optionalUser = userRepository.findByLogin(userDto.login());
+        Optional<User> optionalUser = userRepository.findByUsername(userDto.username());
 
         if (optionalUser.isPresent()) {
             throw new AppException("Login already exists", HttpStatus.BAD_REQUEST);
@@ -57,12 +58,6 @@ public class UserServiceImpl implements IUserService {
         User savedUser = userRepository.save(user);
 
         return userMapper.userToUserDTO(savedUser);
-    }
-
-    public UserDTO findByLogin(String login) {
-        User user = userRepository.findByLogin(login)
-                .orElseThrow(() -> new AppException("Unknown user", HttpStatus.NOT_FOUND));
-        return userMapper.userToUserDTO(user);
     }
 
 
@@ -105,12 +100,23 @@ public class UserServiceImpl implements IUserService {
     public Optional<UserDTO> updateUser(int id, UserUpdateRequest userUpdateRequest) {
         AtomicReference<Optional<UserDTO>> atomicReference = new AtomicReference<>();
 
-        userRepository.findById(id).ifPresentOrElse(foundUser -> {
-            foundUser.setFirstname(userUpdateRequest.getFirstname());
-            foundUser.setUsername(userUpdateRequest.getUsername());
-            foundUser.setLastname(userUpdateRequest.getLastname());
-            foundUser.setPassword(userUpdateRequest.getPassword());
-            foundUser.setEmail(userUpdateRequest.getEmail());
+        userRepository.findById(userUpdateRequest.getId()).ifPresentOrElse(foundUser -> {
+            System.out.println(userUpdateRequest.getFirstname());
+            System.out.println(userUpdateRequest.getId());
+
+            PasswordConfig
+            System.out.println(userUpdateRequest.getPassword());
+            System.out.println(userUpdateRequest.getLastname());
+            System.out.println(userUpdateRequest.getEmail());
+
+            foundUser.setFirstname( userUpdateRequest.getFirstname());
+            foundUser.setLastname( userUpdateRequest.getLastname());
+            foundUser.setPassword( userUpdateRequest.getPassword());
+            foundUser.setEmail( userUpdateRequest.getEmail());
+
+            System.out.printf(foundUser.getPassword() + foundUser.getEmail() + foundUser.getLastname(),
+                    foundUser.getFirstname() + foundUser.getId());
+
             atomicReference.set(Optional.of(userMapper.userToUserDTO(userRepository.save(foundUser))));
         }, () -> {
             atomicReference.set(Optional.empty());
@@ -118,6 +124,7 @@ public class UserServiceImpl implements IUserService {
 
         return atomicReference.get();
     }
+
 
     @Override
     public Boolean deleteUser(int id) {

@@ -29,7 +29,17 @@ public class SecurityConfig {
                 .csrf(AbstractHttpConfigurer::disable)
                 .sessionManagement(customizer -> customizer.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 .authorizeHttpRequests((requests) -> requests
-                        .requestMatchers(new AntPathRequestMatcher("/login", "POST"), new AntPathRequestMatcher("/register", "POST")).permitAll()
+                        .requestMatchers(new AntPathRequestMatcher("/login", "POST"),
+                                new AntPathRequestMatcher("/register", "POST")).permitAll()
+                        .requestMatchers(
+                                new AntPathRequestMatcher("/posts", "POST"),
+                                new AntPathRequestMatcher("/posts", "GET"),
+                                new AntPathRequestMatcher("/posts/**")).authenticated()
+                        .requestMatchers(
+                                new AntPathRequestMatcher("/posts", "GET"),
+                                new AntPathRequestMatcher("/posts", "POST"),
+                                new AntPathRequestMatcher("/posts", "PATCH"),
+                                new AntPathRequestMatcher("/posts", "DELETE")).authenticated()
                         .anyRequest().authenticated())
         ;
         return http.build();
